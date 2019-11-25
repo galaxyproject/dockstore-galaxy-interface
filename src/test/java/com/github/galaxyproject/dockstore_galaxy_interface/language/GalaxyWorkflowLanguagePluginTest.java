@@ -1,9 +1,14 @@
-package io.dockstore.language;
+package com.github.galaxyproject.dockstore_galaxy_interface.language;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.regex.Matcher;
+
+import io.dockstore.common.VersionTypeValidation;
+import io.dockstore.language.RecommendedLanguageInterface;
+import io.dockstore.language.MinimalLanguageInterface;
 
 import com.google.common.io.Resources;
 import org.apache.commons.lang3.tuple.Pair;
@@ -14,22 +19,66 @@ import com.github.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkfl
 
 
 public class GalaxyWorkflowLanguagePluginTest {
+    public static final String EXAMPLE_FILENAME_1 = "Dockstore.gxwf.yml";
+    public static final String EXAMPLE_FILENAME_1_PATH = "/" + EXAMPLE_FILENAME_1;
+    public static final String EXAMPLE_FILENAME_2 = "Dockstore.gxwf.yaml";
+    public static final String EXAMPLE_FILENAME_2_PATH = "/" + EXAMPLE_FILENAME_2;
 
     @Test
     public void testWorkflowParsing() {
-        GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
-        HttpFileReader reader = new HttpFileReader();
+        final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+        final HttpFileReader reader = new HttpFileReader();
+        final String initialPath = EXAMPLE_FILENAME_1_PATH;
+        final String contents = reader.readFile(EXAMPLE_FILENAME_1);
         final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap = plugin
-            .indexWorkflowFiles("/Dockstore.swl", reader.readFile("Dockstore.swl"), reader);
+            .indexWorkflowFiles(initialPath, contents, reader);
         Assert.assertEquals(1, fileMap.size());
-        Assert.assertTrue(fileMap.containsKey("foo.swl"));
+        final Pair<String, MinimalLanguageInterface.GenericFileType> discoveredFile = fileMap.get("/Dockstore.gxwf-test.yml");
+        Assert.assertEquals(discoveredFile.getRight(), MinimalLanguageInterface.GenericFileType.TEST_PARAMETER_FILE);
+        final RecommendedLanguageInterface.WorkflowMetadata metadata = plugin.parseWorkflowForMetadata(initialPath, contents, fileMap);
+        // We don't track these currently, but we could pull out the CWL parsing and mimic that.
+        Assert.assertEquals(null, metadata.getAuthor());
+        Assert.assertEquals(null, metadata.getEmail());
+        // We have name and annotation - not sure if this should just be "<name>"", or "<name>. <annotation>", or
+        // "<name>/n<annotation>".
+        Assert.assertEquals("Test Workflow", metadata.getDescription());
+
+        // Test validation stubs...
+        final VersionTypeValidation wfValidation = plugin.validateWorkflowSet(initialPath, contents, fileMap);
+        Assert.assertTrue(wfValidation.isValid());
+        final VersionTypeValidation testValidation = plugin.validateTestParameterSet(fileMap);
+        Assert.assertTrue(testValidation.isValid());
+    }
+
+    @Test
+    public void testIsNotAService() {
+        final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+        Assert.assertFalse(plugin.isService());
+    }
+
+    @Test
+    public void testInitialPathPattern() {
+        // TODO: This doesn't seem to be called by Dockstore anywhere - is that right?
+        final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+        Matcher m = plugin.initialPathPattern().matcher(EXAMPLE_FILENAME_1_PATH);
+        Assert.assertTrue("File name matches for initial path pattern", m.matches());
+        m = plugin.initialPathPattern().matcher(EXAMPLE_FILENAME_2_PATH);
+        Assert.assertTrue("File name matches for initial path pattern", m.matches());
+
+        m = plugin.initialPathPattern().matcher("/Dockerstore.cwl");
+        Assert.assertFalse(m.matches());
+        m = plugin.initialPathPattern().matcher("/Dockerstore.nf");
+        Assert.assertFalse(m.matches());
     }
 
     public class HttpFileReader implements MinimalLanguageInterface.FileReader {
         @Override
         public String readFile(String path) {
             try {
-                return Resources.toString(new URL("https://raw.githubusercontent.com/denis-yuen/silly-example/master/" + path), StandardCharsets.UTF_8);
+                if(path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                return Resources.toString(new URL("https://raw.githubusercontent.com/jmchilton/galaxy-workflow-dockstore-example-1/master/" + path), StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

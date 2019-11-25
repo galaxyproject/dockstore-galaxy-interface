@@ -11,6 +11,7 @@
     <properties>
         <github.url>scm:git:git@github.com:jmchilton/dockstore-galaxy-interface.git</github.url>
         <dockstore.version>1.7.0-alpha.6</dockstore.version>
+        <slf4j.version>1.7.26</slf4j.version>
     </properties>
 
     <distributionManagement>
@@ -140,9 +141,19 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.24</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>24.1.1-jre</version>
+            <version>27.0.1-jre</version>
         </dependency>
     </dependencies>
 </project>
