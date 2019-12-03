@@ -45,7 +45,7 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
     @Override
     public Pattern initialPathPattern() {
         // Why doesn't this seem to be called anywhere?
-        return Pattern.compile("/.*\\.gxwf\\.y[a]?ml");
+        return Pattern.compile("/(.*\\.gxwf\\.y[a]?ml|.*\\.ga)");
     }
 
     @Override
