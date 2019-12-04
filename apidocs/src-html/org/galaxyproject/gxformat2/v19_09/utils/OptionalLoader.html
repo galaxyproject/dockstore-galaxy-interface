@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">package org.galaxyproject.gxformat2.v19_09.utils;</a>
+<span class="sourceLineNo">002</span><a id="line.2"></a>
+<span class="sourceLineNo">003</span><a id="line.3">import java.util.Optional;</a>
+<span class="sourceLineNo">004</span><a id="line.4"></a>
+<span class="sourceLineNo">005</span><a id="line.5">public class OptionalLoader&lt;T&gt; implements Loader&lt;Optional&lt;T&gt;&gt; {</a>
+<span class="sourceLineNo">006</span><a id="line.6">  private final Loader&lt;T&gt; itemLoader;</a>
+<span class="sourceLineNo">007</span><a id="line.7"></a>
+<span class="sourceLineNo">008</span><a id="line.8">  public OptionalLoader(Loader&lt;T&gt; itemLoader) {</a>
+<span class="sourceLineNo">009</span><a id="line.9">    this.itemLoader = itemLoader;</a>
+<span class="sourceLineNo">010</span><a id="line.10">  }</a>
+<span class="sourceLineNo">011</span><a id="line.11"></a>
+<span class="sourceLineNo">012</span><a id="line.12">  public Optional&lt;T&gt; load(</a>
+<span class="sourceLineNo">013</span><a id="line.13">      final Object doc,</a>
+<span class="sourceLineNo">014</span><a id="line.14">      final String baseUri,</a>
+<span class="sourceLineNo">015</span><a id="line.15">      final LoadingOptions loadingOptions,</a>
+<span class="sourceLineNo">016</span><a id="line.16">      final String docRoot) {</a>
+<span class="sourceLineNo">017</span><a id="line.17">    if (doc == null) {</a>
+<span class="sourceLineNo">018</span><a id="line.18">      return Optional.empty();</a>
+<span class="sourceLineNo">019</span><a id="line.19">    }</a>
+<span class="sourceLineNo">020</span><a id="line.20">    return Optional.of(itemLoader.load(doc, baseUri, loadingOptions, docRoot));</a>
+<span class="sourceLineNo">021</span><a id="line.21">  }</a>
+<span class="sourceLineNo">022</span><a id="line.22">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>

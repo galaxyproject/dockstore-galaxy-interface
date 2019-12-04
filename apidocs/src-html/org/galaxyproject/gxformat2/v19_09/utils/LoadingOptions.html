@@ -1,0 +1,198 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">package org.galaxyproject.gxformat2.v19_09.utils;</a>
+<span class="sourceLineNo">002</span><a id="line.2"></a>
+<span class="sourceLineNo">003</span><a id="line.3">import java.util.ArrayList;</a>
+<span class="sourceLineNo">004</span><a id="line.4">import java.util.Arrays;</a>
+<span class="sourceLineNo">005</span><a id="line.5">import java.util.List;</a>
+<span class="sourceLineNo">006</span><a id="line.6">import java.util.Map;</a>
+<span class="sourceLineNo">007</span><a id="line.7"></a>
+<span class="sourceLineNo">008</span><a id="line.8">public class LoadingOptions {</a>
+<span class="sourceLineNo">009</span><a id="line.9">  Fetcher fetcher;</a>
+<span class="sourceLineNo">010</span><a id="line.10">  String fileUri;</a>
+<span class="sourceLineNo">011</span><a id="line.11">  Map&lt;String, String&gt; namespaces;</a>
+<span class="sourceLineNo">012</span><a id="line.12">  List&lt;String&gt; schemas;</a>
+<span class="sourceLineNo">013</span><a id="line.13">  Map&lt;String, Map&lt;String, Object&gt;&gt; idx;</a>
+<span class="sourceLineNo">014</span><a id="line.14">  Map&lt;String, String&gt; vocab;</a>
+<span class="sourceLineNo">015</span><a id="line.15">  Map&lt;String, String&gt; rvocab;</a>
+<span class="sourceLineNo">016</span><a id="line.16"></a>
+<span class="sourceLineNo">017</span><a id="line.17">  LoadingOptions(</a>
+<span class="sourceLineNo">018</span><a id="line.18">      final Fetcher fetcher,</a>
+<span class="sourceLineNo">019</span><a id="line.19">      final String fileUri,</a>
+<span class="sourceLineNo">020</span><a id="line.20">      final Map&lt;String, String&gt; namespaces,</a>
+<span class="sourceLineNo">021</span><a id="line.21">      final List&lt;String&gt; schemas,</a>
+<span class="sourceLineNo">022</span><a id="line.22">      final Map&lt;String, Map&lt;String, Object&gt;&gt; idx) {</a>
+<span class="sourceLineNo">023</span><a id="line.23">    this.fetcher = fetcher;</a>
+<span class="sourceLineNo">024</span><a id="line.24">    this.fileUri = fileUri;</a>
+<span class="sourceLineNo">025</span><a id="line.25">    this.namespaces = namespaces;</a>
+<span class="sourceLineNo">026</span><a id="line.26">    this.schemas = schemas;</a>
+<span class="sourceLineNo">027</span><a id="line.27">    this.idx = idx;</a>
+<span class="sourceLineNo">028</span><a id="line.28"></a>
+<span class="sourceLineNo">029</span><a id="line.29">    if (namespaces != null) {</a>
+<span class="sourceLineNo">030</span><a id="line.30">      this.vocab = (Map&lt;String, String&gt;) ConstantMaps.vocab.clone();</a>
+<span class="sourceLineNo">031</span><a id="line.31">      this.rvocab = (Map&lt;String, String&gt;) ConstantMaps.rvocab.clone();</a>
+<span class="sourceLineNo">032</span><a id="line.32">      for (Map.Entry&lt;String, String&gt; namespaceEntry : namespaces.entrySet()) {</a>
+<span class="sourceLineNo">033</span><a id="line.33">        this.vocab.put(namespaceEntry.getKey(), namespaceEntry.getValue());</a>
+<span class="sourceLineNo">034</span><a id="line.34">        this.rvocab.put(namespaceEntry.getValue(), namespaceEntry.getKey());</a>
+<span class="sourceLineNo">035</span><a id="line.35">      }</a>
+<span class="sourceLineNo">036</span><a id="line.36">    } else {</a>
+<span class="sourceLineNo">037</span><a id="line.37">      this.vocab = (Map&lt;String, String&gt;) ConstantMaps.vocab;</a>
+<span class="sourceLineNo">038</span><a id="line.38">      this.rvocab = (Map&lt;String, String&gt;) ConstantMaps.rvocab;</a>
+<span class="sourceLineNo">039</span><a id="line.39">    }</a>
+<span class="sourceLineNo">040</span><a id="line.40">  }</a>
+<span class="sourceLineNo">041</span><a id="line.41"></a>
+<span class="sourceLineNo">042</span><a id="line.42">  public String expandUrl(</a>
+<span class="sourceLineNo">043</span><a id="line.43">      String url_,</a>
+<span class="sourceLineNo">044</span><a id="line.44">      final String baseUrl,</a>
+<span class="sourceLineNo">045</span><a id="line.45">      final boolean scopedId,</a>
+<span class="sourceLineNo">046</span><a id="line.46">      final boolean vocabTerm,</a>
+<span class="sourceLineNo">047</span><a id="line.47">      final Integer scopedRef) {</a>
+<span class="sourceLineNo">048</span><a id="line.48">    // NOT CONVERTING this - doesn't match type declaration</a>
+<span class="sourceLineNo">049</span><a id="line.49">    // if not isinstance(url, string_types):</a>
+<span class="sourceLineNo">050</span><a id="line.50">    //    return url</a>
+<span class="sourceLineNo">051</span><a id="line.51">    String url = url_;</a>
+<span class="sourceLineNo">052</span><a id="line.52">    if (url.equals("@id") || url.equals("@type")) {</a>
+<span class="sourceLineNo">053</span><a id="line.53">      return url;</a>
+<span class="sourceLineNo">054</span><a id="line.54">    }</a>
+<span class="sourceLineNo">055</span><a id="line.55"></a>
+<span class="sourceLineNo">056</span><a id="line.56">    if (vocabTerm &amp;&amp; this.vocab.containsKey(url)) {</a>
+<span class="sourceLineNo">057</span><a id="line.57">      return url;</a>
+<span class="sourceLineNo">058</span><a id="line.58">    }</a>
+<span class="sourceLineNo">059</span><a id="line.59"></a>
+<span class="sourceLineNo">060</span><a id="line.60">    if (!this.vocab.isEmpty() &amp;&amp; url.contains(":")) {</a>
+<span class="sourceLineNo">061</span><a id="line.61">      String prefix = url.split(":", 1)[0];</a>
+<span class="sourceLineNo">062</span><a id="line.62">      if (this.vocab.containsKey(prefix)) {</a>
+<span class="sourceLineNo">063</span><a id="line.63">        url = this.vocab.get(prefix) + url.substring(prefix.length() + 1);</a>
+<span class="sourceLineNo">064</span><a id="line.64">      }</a>
+<span class="sourceLineNo">065</span><a id="line.65">    }</a>
+<span class="sourceLineNo">066</span><a id="line.66"></a>
+<span class="sourceLineNo">067</span><a id="line.67">    Uris.UriSplit split = Uris.split(url);</a>
+<span class="sourceLineNo">068</span><a id="line.68">    final String scheme = split.scheme;</a>
+<span class="sourceLineNo">069</span><a id="line.69">    final boolean hasFragment = stringHasContent(split.fragment);</a>
+<span class="sourceLineNo">070</span><a id="line.70">    if (scheme != null</a>
+<span class="sourceLineNo">071</span><a id="line.71">        &amp;&amp; ((scheme.length() &gt; 0</a>
+<span class="sourceLineNo">072</span><a id="line.72">                &amp;&amp; (scheme.equals("http") || scheme.equals("https") || scheme.equals("file")))</a>
+<span class="sourceLineNo">073</span><a id="line.73">            || url.startsWith("$(")</a>
+<span class="sourceLineNo">074</span><a id="line.74">            || url.startsWith("${"))) {</a>
+<span class="sourceLineNo">075</span><a id="line.75">      // pass</a>
+<span class="sourceLineNo">076</span><a id="line.76">    } else if (scopedId &amp;&amp; !hasFragment) {</a>
+<span class="sourceLineNo">077</span><a id="line.77">      final Uris.UriSplit splitbase = Uris.split(baseUrl);</a>
+<span class="sourceLineNo">078</span><a id="line.78">      final String frg;</a>
+<span class="sourceLineNo">079</span><a id="line.79">      if (stringHasContent(splitbase.fragment)) {</a>
+<span class="sourceLineNo">080</span><a id="line.80">        frg = splitbase.fragment + "/" + split.path;</a>
+<span class="sourceLineNo">081</span><a id="line.81">      } else {</a>
+<span class="sourceLineNo">082</span><a id="line.82">        frg = split.path;</a>
+<span class="sourceLineNo">083</span><a id="line.83">      }</a>
+<span class="sourceLineNo">084</span><a id="line.84">      String pt;</a>
+<span class="sourceLineNo">085</span><a id="line.85">      if (!splitbase.path.equals("")) {</a>
+<span class="sourceLineNo">086</span><a id="line.86">        pt = splitbase.path;</a>
+<span class="sourceLineNo">087</span><a id="line.87">      } else {</a>
+<span class="sourceLineNo">088</span><a id="line.88">        pt = "/";</a>
+<span class="sourceLineNo">089</span><a id="line.89">      }</a>
+<span class="sourceLineNo">090</span><a id="line.90">      url = Uris.unsplit(splitbase.scheme, splitbase.netloc, pt, splitbase.query, frg);</a>
+<span class="sourceLineNo">091</span><a id="line.91">    } else if (scopedRef != null &amp;&amp; !hasFragment) {</a>
+<span class="sourceLineNo">092</span><a id="line.92">      final Uris.UriSplit splitbase = Uris.split(baseUrl);</a>
+<span class="sourceLineNo">093</span><a id="line.93">      final ArrayList&lt;String&gt; sp = new ArrayList(Arrays.asList(splitbase.fragment.split("/")));</a>
+<span class="sourceLineNo">094</span><a id="line.94">      int n = scopedRef;</a>
+<span class="sourceLineNo">095</span><a id="line.95">      while (n &gt; 0 &amp;&amp; sp.size() &gt; 0) {</a>
+<span class="sourceLineNo">096</span><a id="line.96">        sp.remove(0);</a>
+<span class="sourceLineNo">097</span><a id="line.97">        n -= 1;</a>
+<span class="sourceLineNo">098</span><a id="line.98">      }</a>
+<span class="sourceLineNo">099</span><a id="line.99">      sp.add(url);</a>
+<span class="sourceLineNo">100</span><a id="line.100">      final String fragment = String.join("/", sp);</a>
+<span class="sourceLineNo">101</span><a id="line.101">      url =</a>
+<span class="sourceLineNo">102</span><a id="line.102">          Uris.unsplit(</a>
+<span class="sourceLineNo">103</span><a id="line.103">              splitbase.scheme, splitbase.netloc, splitbase.path, splitbase.query, fragment);</a>
+<span class="sourceLineNo">104</span><a id="line.104">    } else {</a>
+<span class="sourceLineNo">105</span><a id="line.105">      url = this.fetcher.urlJoin(baseUrl, url);</a>
+<span class="sourceLineNo">106</span><a id="line.106">    }</a>
+<span class="sourceLineNo">107</span><a id="line.107"></a>
+<span class="sourceLineNo">108</span><a id="line.108">    if (vocabTerm) {</a>
+<span class="sourceLineNo">109</span><a id="line.109">      split = Uris.split(url);</a>
+<span class="sourceLineNo">110</span><a id="line.110">      if (stringHasContent(split.scheme)) {</a>
+<span class="sourceLineNo">111</span><a id="line.111">        if (this.rvocab.containsKey(url)) {</a>
+<span class="sourceLineNo">112</span><a id="line.112">          return this.rvocab.get(url);</a>
+<span class="sourceLineNo">113</span><a id="line.113">        }</a>
+<span class="sourceLineNo">114</span><a id="line.114">      } else {</a>
+<span class="sourceLineNo">115</span><a id="line.115">        throw new ValidationException("Term '{}' not in vocabulary".format(url));</a>
+<span class="sourceLineNo">116</span><a id="line.116">      }</a>
+<span class="sourceLineNo">117</span><a id="line.117">    }</a>
+<span class="sourceLineNo">118</span><a id="line.118">    return url;</a>
+<span class="sourceLineNo">119</span><a id="line.119">  }</a>
+<span class="sourceLineNo">120</span><a id="line.120"></a>
+<span class="sourceLineNo">121</span><a id="line.121">  static boolean stringHasContent(final String s) {</a>
+<span class="sourceLineNo">122</span><a id="line.122">    return s != null &amp;&amp; s.length() &gt; 0;</a>
+<span class="sourceLineNo">123</span><a id="line.123">  }</a>
+<span class="sourceLineNo">124</span><a id="line.124">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>
