@@ -1,4 +1,4 @@
-package com.github.galaxyproject.dockstore_galaxy_interface.language;
+package org.galaxyproject.dockstore_galaxy_interface.language;
 
 import java.util.HashMap;
 import java.util.List;

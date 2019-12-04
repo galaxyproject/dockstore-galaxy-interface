@@ -1,4 +1,4 @@
-package com.github.galaxyproject.dockstore_galaxy_interface.language;
+package org.galaxyproject.dockstore_galaxy_interface.language;
 
 import java.io.IOException;
 import java.net.URL;
@@ -14,8 +14,6 @@ import com.google.common.io.Resources;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.github.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkflowPlugin;
 
 
 public class GalaxyWorkflowLanguagePluginTest {
