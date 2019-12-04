@@ -16,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import org.galaxyproject.gxformat2.Lint;
+import org.galaxyproject.gxformat2.LintContext;
+
 /**
  * @author jmchilton
  */
@@ -32,8 +35,14 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
     @Override
     public VersionTypeValidation validateWorkflowSet(String initialPath, String contents,
         Map<String, Pair<String, GenericFileType>> indexedFiles) {
-        final VersionTypeValidation validation = new VersionTypeValidation(true, new HashMap<>());
-        // TODO: fill this in
+        final LintContext lintContext = Lint.lint(loadWorkflow(contents));
+        final boolean valid;
+        if (lintContext.getFoundErrors()) {
+            valid = false;
+        } else {
+            valid = true;
+        }
+        final VersionTypeValidation validation = new VersionTypeValidation(valid, new HashMap<>());
         return validation;
     }
 
@@ -81,15 +90,19 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
         }
     }
 
+    static Map<String, Object> loadWorkflow(final String content) {
+        final Yaml yaml = new Yaml();
+        final Map map = yaml.loadAs(content, Map.class);
+        return (Map<String, Object>) map;
+    }
+
     @Override
     public RecommendedLanguageInterface.WorkflowMetadata parseWorkflowForMetadata(String initialPath, String content,
         Map<String, Pair<String, GenericFileType>> indexedFiles) {
         RecommendedLanguageInterface.WorkflowMetadata metadata = new RecommendedLanguageInterface.WorkflowMetadata();
         if (content != null && !content.isEmpty()) {
             try {
-                Yaml yaml = new Yaml();
-                Map map = yaml.loadAs(content, Map.class);
-
+                final Map<String, Object> map = loadWorkflow(content);
                 String name = null;
                 try {
                     name = (String)map.get("name");
