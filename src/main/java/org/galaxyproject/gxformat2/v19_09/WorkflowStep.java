@@ -8,12 +8,32 @@ import org.galaxyproject.gxformat2.v19_09.utils.Savable;
  *
  * <BLOCKQUOTE>
  *
- * Workflow step.
+ * This represents a non-input step a Galaxy Workflow.
+ *
+ * <p># A note about `state` and `tool_state` fields.
+ *
+ * <p>Only one or the other should be specified. These are two ways to represent the "state" of a
+ * tool at this workflow step. Both are essentially maps from parameter names to parameter values.
+ *
+ * <p>`tool_state` is much more low-level and expects a flat dictionary with each value a JSON dump.
+ * Nested tool structures such as conditionals and repeats should have all their values in the JSON
+ * dumped string. In general `tool_state` may be present in workflows exported from Galaxy but
+ * shouldn't be written by humans.
+ *
+ * <p>`state` can contained a typed map. Repeat values can be represented as YAML arrays. An
+ * alternative to representing `state` this way is defining inputs with default values.
  *
  * </BLOCKQUOTE>
  */
 public interface WorkflowStep
-    extends Identified, Labeled, Documented, HasStepPosition, ReferencesTool, Savable {
+    extends Identified,
+        Labeled,
+        Documented,
+        HasStepPosition,
+        ReferencesTool,
+        HasStepErrors,
+        HasUUID,
+        Savable {
   /**
    * Getter for property <I>https://w3id.org/cwl/cwl#Identified/id</I><br>
    *
@@ -86,6 +106,34 @@ public interface WorkflowStep
    */
   java.util.Optional<String> getTool_version();
   /**
+   * Getter for property
+   * <I>https://galaxyproject.org/gxformat2/gxformat2common#HasStepErrors/errors</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * During Galaxy export there may be some problem validating the tool state, tool used, etc.. that
+   * will be indicated by this field. The Galaxy user should be warned of these problems before the
+   * workflow can be used in Galaxy.
+   *
+   * <p>This field should not be used in human written Galaxy workflow files.
+   *
+   * <p>A typical problem is the referenced tool is not installed, this can be fixed by installed
+   * the tool and re-saving the workflow and then re-exporting it. *
+   *
+   * </BLOCKQUOTE>
+   */
+  java.util.Optional<String> getErrors();
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/gxformat2common#HasUUID/uuid</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * UUID uniquely representing this element. *
+   *
+   * </BLOCKQUOTE>
+   */
+  java.util.Optional<String> getUuid();
+  /**
    * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#in</I><br>
    *
    * <BLOCKQUOTE>
@@ -104,13 +152,16 @@ public interface WorkflowStep
    * <BLOCKQUOTE>
    *
    * Defines the parameters representing the output of the process. May be used to generate and/or
-   * validate the output object. *
+   * validate the output object.
+   *
+   * <p>This can also be called 'outputs' for legacy reasons - but the resulting workflow document
+   * is not a valid instance of this schema. *
    *
    * </BLOCKQUOTE>
    */
   java.util.Optional<java.util.List<Object>> getOut();
   /**
-   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#WorkflowStep/state</I><br>
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#state</I><br>
    *
    * <BLOCKQUOTE>
    *
@@ -119,6 +170,16 @@ public interface WorkflowStep
    * </BLOCKQUOTE>
    */
   java.util.Optional<Object> getState();
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#tool_state</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * Unstructured tool state. *
+   *
+   * </BLOCKQUOTE>
+   */
+  java.util.Optional<Object> getTool_state();
   /**
    * Getter for property <I>https://w3id.org/cwl/salad#type</I><br>
    *
@@ -139,4 +200,9 @@ public interface WorkflowStep
    * </BLOCKQUOTE>
    */
   java.util.Optional<GalaxyWorkflow> getRun();
+  /**
+   * Getter for property
+   * <I>https://galaxyproject.org/gxformat2/v19_09#WorkflowStep/runtime_inputs</I><br>
+   */
+  java.util.Optional<java.util.List<Object>> getRuntime_inputs();
 }

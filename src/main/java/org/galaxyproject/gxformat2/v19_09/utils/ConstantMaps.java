@@ -15,8 +15,10 @@ public class ConstantMaps {
     vocab.put("File", "https://galaxyproject.org/gxformat2/v19_09#GalaxyType/File");
     vocab.put("GalaxyType", "https://galaxyproject.org/gxformat2/v19_09#GalaxyType");
     vocab.put("GalaxyWorkflow", "https://galaxyproject.org/gxformat2/v19_09#GalaxyWorkflow");
+    vocab.put("HasStepErrors", "https://galaxyproject.org/gxformat2/gxformat2common#HasStepErrors");
     vocab.put(
         "HasStepPosition", "https://galaxyproject.org/gxformat2/gxformat2common#HasStepPosition");
+    vocab.put("HasUUID", "https://galaxyproject.org/gxformat2/gxformat2common#HasUUID");
     vocab.put("Identified", "https://w3id.org/cwl/cwl#Identified");
     vocab.put("InputParameter", "https://w3id.org/cwl/cwl#InputParameter");
     vocab.put("Labeled", "https://w3id.org/cwl/cwl#Labeled");
@@ -28,6 +30,7 @@ public class ConstantMaps {
     vocab.put("RecordSchema", "https://w3id.org/cwl/salad#RecordSchema");
     vocab.put(
         "ReferencesTool", "https://galaxyproject.org/gxformat2/gxformat2common#ReferencesTool");
+    vocab.put("Report", "https://galaxyproject.org/gxformat2/v19_09#Report");
     vocab.put("Sink", "https://galaxyproject.org/gxformat2/v19_09#Sink");
     vocab.put("StepPosition", "https://galaxyproject.org/gxformat2/gxformat2common#StepPosition");
     vocab.put(
@@ -69,7 +72,10 @@ public class ConstantMaps {
     rvocab.put("https://galaxyproject.org/gxformat2/v19_09#GalaxyType", "GalaxyType");
     rvocab.put("https://galaxyproject.org/gxformat2/v19_09#GalaxyWorkflow", "GalaxyWorkflow");
     rvocab.put(
+        "https://galaxyproject.org/gxformat2/gxformat2common#HasStepErrors", "HasStepErrors");
+    rvocab.put(
         "https://galaxyproject.org/gxformat2/gxformat2common#HasStepPosition", "HasStepPosition");
+    rvocab.put("https://galaxyproject.org/gxformat2/gxformat2common#HasUUID", "HasUUID");
     rvocab.put("https://w3id.org/cwl/cwl#Identified", "Identified");
     rvocab.put("https://w3id.org/cwl/cwl#InputParameter", "InputParameter");
     rvocab.put("https://w3id.org/cwl/cwl#Labeled", "Labeled");
@@ -81,6 +87,7 @@ public class ConstantMaps {
     rvocab.put("https://w3id.org/cwl/salad#RecordSchema", "RecordSchema");
     rvocab.put(
         "https://galaxyproject.org/gxformat2/gxformat2common#ReferencesTool", "ReferencesTool");
+    rvocab.put("https://galaxyproject.org/gxformat2/v19_09#Report", "Report");
     rvocab.put("https://galaxyproject.org/gxformat2/v19_09#Sink", "Sink");
     rvocab.put("https://galaxyproject.org/gxformat2/gxformat2common#StepPosition", "StepPosition");
     rvocab.put(

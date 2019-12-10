@@ -12,7 +12,19 @@ import org.galaxyproject.gxformat2.v19_09.utils.ValidationException;
  *
  * <BLOCKQUOTE>
  *
- * This is documentation for a workflow!
+ * A Galaxy workflow description. This record corresponds to the description of a workflow that
+ * should be executable on a Galaxy server that includes the contained tool definitions.
+ *
+ * <p>The workflows API or the user interface of Galaxy instances that are of version 19.09 or newer
+ * should be able to import a document defining this record.
+ *
+ * <p>## A note about `label` field.
+ *
+ * <p>This is the name of the workflow in the Galaxy user interface. This is the mechanism that
+ * users will primarily identify the workflow using. Legacy support - this may also be called 'name'
+ * and Galaxy will consume the workflow document fine and treat this attribute correctly - however
+ * in order to validate against this workflow definition schema the attribute should be called
+ * `label`.
  *
  * </BLOCKQUOTE>
  */
@@ -104,6 +116,21 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
     return this.outputs;
   }
 
+  private java.util.Optional<String> uuid;
+
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/gxformat2common#HasUUID/uuid</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * UUID uniquely representing this element. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<String> getUuid() {
+    return this.uuid;
+  }
+
   private String class_;
 
   /**
@@ -127,6 +154,21 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
    */
   public java.util.List<Object> getSteps() {
     return this.steps;
+  }
+
+  private java.util.Optional<Report> report;
+
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#GalaxyWorkflow/report</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * Workflow invocation report template. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<Report> getReport() {
+    return this.report;
   }
 
   /**
@@ -237,6 +279,22 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
       final String __message = "the `outputs` field is not valid because:";
       __errors.add(new ValidationException(__message, e));
     }
+    java.util.Optional<String> uuid;
+
+    if (__doc.containsKey("uuid")) {
+      try {
+        uuid =
+            LoaderInstances.optional_StringInstance.loadField(
+                __doc.get("uuid"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        uuid = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `uuid` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      uuid = null;
+    }
     String class_;
     try {
       class_ =
@@ -257,6 +315,22 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
       final String __message = "the `steps` field is not valid because:";
       __errors.add(new ValidationException(__message, e));
     }
+    java.util.Optional<Report> report;
+
+    if (__doc.containsKey("report")) {
+      try {
+        report =
+            LoaderInstances.optional_Report.loadField(
+                __doc.get("report"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        report = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `report` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      report = null;
+    }
     if (!__errors.isEmpty()) {
       throw new ValidationException("Trying 'RecordField'", __errors);
     }
@@ -265,7 +339,9 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
     this.doc = (Object) doc;
     this.inputs = (java.util.List<Object>) inputs;
     this.outputs = (java.util.List<Object>) outputs;
+    this.uuid = (java.util.Optional<String>) uuid;
     this.class_ = (String) class_;
     this.steps = (java.util.List<Object>) steps;
+    this.report = (java.util.Optional<Report>) report;
   }
 }

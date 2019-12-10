@@ -7,54 +7,37 @@ import org.galaxyproject.gxformat2.v19_09.utils.SavableImpl;
 import org.galaxyproject.gxformat2.v19_09.utils.ValidationException;
 
 /**
- * Auto-generated class implementation for
- * <I>https://galaxyproject.org/gxformat2/gxformat2common#StepPosition</I><br>
+ * Auto-generated class implementation for <I>https://galaxyproject.org/gxformat2/v19_09#Report</I>
+ * <br>
  *
  * <BLOCKQUOTE>
  *
- * This field specifies the location of the step's node when rendered in the workflow editor.
+ * Definition of an invocation report for this workflow. Currently the only field is 'markdown'.
  *
  * </BLOCKQUOTE>
  */
-public class StepPositionImpl extends SavableImpl implements StepPosition {
+public class ReportImpl extends SavableImpl implements Report {
   private LoadingOptions loadingOptions_ = new LoadingOptionsBuilder().build();
   private java.util.Map<String, Object> extensionFields_ = new java.util.HashMap<String, Object>();
 
-  private Object top;
+  private String markdown;
 
   /**
-   * Getter for property <I>https://galaxyproject.org/gxformat2/gxformat2common#StepPosition/top</I>
-   * <br>
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#Report/markdown</I><br>
    *
    * <BLOCKQUOTE>
    *
-   * Relative vertical position of the step's node when rendered in the workflow editor. *
+   * Galaxy flavored Markdown to define an invocation report. *
    *
    * </BLOCKQUOTE>
    */
-  public Object getTop() {
-    return this.top;
-  }
-
-  private Object left;
-
-  /**
-   * Getter for property
-   * <I>https://galaxyproject.org/gxformat2/gxformat2common#StepPosition/left</I><br>
-   *
-   * <BLOCKQUOTE>
-   *
-   * Relative horizontal position of the step's node when rendered in the workflow editor. *
-   *
-   * </BLOCKQUOTE>
-   */
-  public Object getLeft() {
-    return this.left;
+  public String getMarkdown() {
+    return this.markdown;
   }
 
   /**
    * Used by {@link org.galaxyproject.gxformat2.v19_09.utils.RootLoader} to construct instances of
-   * StepPositionImpl.
+   * ReportImpl.
    *
    * @param __doc_ Document fragment to load this record object from (presumably a {@link
    *     java.util.Map}).
@@ -64,7 +47,7 @@ public class StepPositionImpl extends SavableImpl implements StepPosition {
    * @throws ValidationException If the document fragment is not a {@link java.util.Map} or
    *     validation of fields fails.
    */
-  public StepPositionImpl(
+  public ReportImpl(
       final Object __doc_,
       final String __baseUri_,
       LoadingOptions __loadingOptions,
@@ -75,7 +58,7 @@ public class StepPositionImpl extends SavableImpl implements StepPosition {
     String __baseUri = __baseUri_;
     String __docRoot = __docRoot_;
     if (!(__doc_ instanceof java.util.Map)) {
-      throw new ValidationException("StepPositionImpl called on non-map");
+      throw new ValidationException("ReportImpl called on non-map");
     }
     final java.util.Map<String, Object> __doc = (java.util.Map<String, Object>) __doc_;
     final java.util.List<ValidationException> __errors =
@@ -83,30 +66,19 @@ public class StepPositionImpl extends SavableImpl implements StepPosition {
     if (__loadingOptions != null) {
       this.loadingOptions_ = __loadingOptions;
     }
-    Object top;
+    String markdown;
     try {
-      top =
-          LoaderInstances.union_of_FloatInstance_or_IntegerInstance.loadField(
-              __doc.get("top"), __baseUri, __loadingOptions);
+      markdown =
+          LoaderInstances.StringInstance.loadField(
+              __doc.get("markdown"), __baseUri, __loadingOptions);
     } catch (ValidationException e) {
-      top = null; // won't be used but prevents compiler from complaining.
-      final String __message = "the `top` field is not valid because:";
-      __errors.add(new ValidationException(__message, e));
-    }
-    Object left;
-    try {
-      left =
-          LoaderInstances.union_of_FloatInstance_or_IntegerInstance.loadField(
-              __doc.get("left"), __baseUri, __loadingOptions);
-    } catch (ValidationException e) {
-      left = null; // won't be used but prevents compiler from complaining.
-      final String __message = "the `left` field is not valid because:";
+      markdown = null; // won't be used but prevents compiler from complaining.
+      final String __message = "the `markdown` field is not valid because:";
       __errors.add(new ValidationException(__message, e));
     }
     if (!__errors.isEmpty()) {
       throw new ValidationException("Trying 'RecordField'", __errors);
     }
-    this.top = (Object) top;
-    this.left = (Object) left;
+    this.markdown = (String) markdown;
   }
 }
