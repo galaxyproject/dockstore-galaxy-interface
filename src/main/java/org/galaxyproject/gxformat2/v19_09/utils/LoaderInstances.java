@@ -3,14 +3,14 @@ package org.galaxyproject.gxformat2.v19_09.utils;
 import org.galaxyproject.gxformat2.v19_09.*;
 
 public class LoaderInstances {
-  public static Loader<Integer> IntegerInstance = new PrimitiveLoader<Integer>(Integer.class);
-  public static Loader<Boolean> BooleanInstance = new PrimitiveLoader<Boolean>(Boolean.class);
   public static Loader<String> StringInstance = new PrimitiveLoader<String>(String.class);
-  public static Loader<Object> AnyInstance = new AnyLoader();
+  public static Loader<Integer> IntegerInstance = new PrimitiveLoader<Integer>(Integer.class);
   public static Loader<Long> LongInstance = new PrimitiveLoader<Long>(Long.class);
   public static Loader<Float> FloatInstance = new PrimitiveLoader<Float>(Float.class);
-  public static Loader<Object> NullInstance = new NullLoader();
   public static Loader<Double> DoubleInstance = new PrimitiveLoader<Double>(Double.class);
+  public static Loader<Boolean> BooleanInstance = new PrimitiveLoader<Boolean>(Boolean.class);
+  public static Loader<Object> NullInstance = new NullLoader();
+  public static Loader<Object> AnyInstance = new AnyLoader();
   public static Loader<org.galaxyproject.gxformat2.v19_09.Documented> Documented =
       new RecordLoader<org.galaxyproject.gxformat2.v19_09.Documented>(
           org.galaxyproject.gxformat2.v19_09.Documented.class);
@@ -46,6 +46,12 @@ public class LoaderInstances {
   public static Loader<org.galaxyproject.gxformat2.v19_09.Process> Process =
       new RecordLoader<org.galaxyproject.gxformat2.v19_09.Process>(
           org.galaxyproject.gxformat2.v19_09.Process.class);
+  public static Loader<org.galaxyproject.gxformat2.v19_09.HasUUID> HasUUID =
+      new RecordLoader<org.galaxyproject.gxformat2.v19_09.HasUUID>(
+          org.galaxyproject.gxformat2.v19_09.HasUUID.class);
+  public static Loader<org.galaxyproject.gxformat2.v19_09.HasStepErrors> HasStepErrors =
+      new RecordLoader<org.galaxyproject.gxformat2.v19_09.HasStepErrors>(
+          org.galaxyproject.gxformat2.v19_09.HasStepErrors.class);
   public static Loader<org.galaxyproject.gxformat2.v19_09.HasStepPosition> HasStepPosition =
       new RecordLoader<org.galaxyproject.gxformat2.v19_09.HasStepPosition>(
           org.galaxyproject.gxformat2.v19_09.HasStepPosition.class);
@@ -77,6 +83,9 @@ public class LoaderInstances {
   public static Loader<org.galaxyproject.gxformat2.v19_09.WorkflowStepInput> WorkflowStepInput =
       new RecordLoader<org.galaxyproject.gxformat2.v19_09.WorkflowStepInput>(
           org.galaxyproject.gxformat2.v19_09.WorkflowStepInputImpl.class);
+  public static Loader<org.galaxyproject.gxformat2.v19_09.Report> Report =
+      new RecordLoader<org.galaxyproject.gxformat2.v19_09.Report>(
+          org.galaxyproject.gxformat2.v19_09.ReportImpl.class);
   public static Loader<org.galaxyproject.gxformat2.v19_09.WorkflowStepOutput> WorkflowStepOutput =
       new RecordLoader<org.galaxyproject.gxformat2.v19_09.WorkflowStepOutput>(
           org.galaxyproject.gxformat2.v19_09.WorkflowStepOutputImpl.class);
@@ -163,6 +172,8 @@ public class LoaderInstances {
       new IdMapLoader(array_of_WorkflowOutputParameter, "id", "type");
   public static Loader<java.util.Optional<StepPosition>> optional_StepPosition =
       new OptionalLoader(StepPosition);
+  public static Loader<Object> union_of_FloatInstance_or_IntegerInstance =
+      new UnionLoader(new Loader[] {FloatInstance, IntegerInstance});
   public static Loader<java.util.Optional<ToolShedRepository>> optional_ToolShedRepository =
       new OptionalLoader(ToolShedRepository);
   public static Loader<java.util.Optional<GalaxyType>> optional_GalaxyType =
@@ -185,9 +196,9 @@ public class LoaderInstances {
       optional_array_of_union_of_StringInstance_or_WorkflowStepOutput =
           new OptionalLoader(array_of_union_of_StringInstance_or_WorkflowStepOutput);
   public static Loader<java.util.Optional<java.util.List<Object>>>
-      uri_optional_array_of_union_of_StringInstance_or_WorkflowStepOutput_True_False_None =
-          new UriLoader(
-              optional_array_of_union_of_StringInstance_or_WorkflowStepOutput, true, false, null);
+      idmap_out_optional_array_of_union_of_StringInstance_or_WorkflowStepOutput =
+          new IdMapLoader(
+              optional_array_of_union_of_StringInstance_or_WorkflowStepOutput, "id", "source");
   public static Loader<java.util.Optional<WorkflowStepType>> optional_WorkflowStepType =
       new OptionalLoader(WorkflowStepType);
   public static Loader<java.util.Optional<WorkflowStepType>> typedsl_optional_WorkflowStepType_2 =
@@ -197,22 +208,23 @@ public class LoaderInstances {
   public static Loader<java.util.Optional<GalaxyWorkflow>>
       uri_optional_GalaxyWorkflow_False_False_None =
           new UriLoader(optional_GalaxyWorkflow, false, false, null);
+  public static Loader<java.util.Optional<java.util.List<Object>>>
+      optional_array_of_StringInstance = new OptionalLoader(array_of_StringInstance);
   public static Loader<Object>
       uri_union_of_NullInstance_or_StringInstance_or_array_of_StringInstance_False_False_2 =
           new UriLoader(
               union_of_NullInstance_or_StringInstance_or_array_of_StringInstance, false, false, 2);
+  public static Loader<java.util.Optional<Boolean>> optional_BooleanInstance =
+      new OptionalLoader(BooleanInstance);
   public static Loader<String> uri_StringInstance_False_True_None =
       new UriLoader(StringInstance, false, true, null);
   public static Loader<java.util.List<WorkflowStep>> array_of_WorkflowStep =
       new ArrayLoader(WorkflowStep);
   public static Loader<java.util.List<Object>> idmap_steps_array_of_WorkflowStep =
       new IdMapLoader(array_of_WorkflowStep, "id", "None");
+  public static Loader<java.util.Optional<Report>> optional_Report = new OptionalLoader(Report);
   public static Loader<java.util.List<GalaxyWorkflow>> array_of_GalaxyWorkflow =
       new ArrayLoader(GalaxyWorkflow);
-  public static Loader<
-          org.galaxyproject.gxformat2.v19_09.utils.OneOrListOf<
-              org.galaxyproject.gxformat2.v19_09.GalaxyWorkflow>>
-      one_or_array_of_GalaxyWorkflow =
-          new OneOrListOfLoader<org.galaxyproject.gxformat2.v19_09.GalaxyWorkflow>(
-              GalaxyWorkflow, array_of_GalaxyWorkflow);
+  public static Loader<Object> union_of_GalaxyWorkflow_or_array_of_GalaxyWorkflow =
+      new UnionLoader(new Loader[] {GalaxyWorkflow, array_of_GalaxyWorkflow});
 }

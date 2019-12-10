@@ -12,7 +12,20 @@ import org.galaxyproject.gxformat2.v19_09.utils.ValidationException;
  *
  * <BLOCKQUOTE>
  *
- * Workflow step.
+ * This represents a non-input step a Galaxy Workflow.
+ *
+ * <p># A note about `state` and `tool_state` fields.
+ *
+ * <p>Only one or the other should be specified. These are two ways to represent the "state" of a
+ * tool at this workflow step. Both are essentially maps from parameter names to parameter values.
+ *
+ * <p>`tool_state` is much more low-level and expects a flat dictionary with each value a JSON dump.
+ * Nested tool structures such as conditionals and repeats should have all their values in the JSON
+ * dumped string. In general `tool_state` may be present in workflows exported from Galaxy but
+ * shouldn't be written by humans.
+ *
+ * <p>`state` can contained a typed map. Repeat values can be represented as YAML arrays. An
+ * alternative to representing `state` this way is defining inputs with default values.
  *
  * </BLOCKQUOTE>
  */
@@ -126,6 +139,44 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
     return this.tool_version;
   }
 
+  private java.util.Optional<String> errors;
+
+  /**
+   * Getter for property
+   * <I>https://galaxyproject.org/gxformat2/gxformat2common#HasStepErrors/errors</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * During Galaxy export there may be some problem validating the tool state, tool used, etc.. that
+   * will be indicated by this field. The Galaxy user should be warned of these problems before the
+   * workflow can be used in Galaxy.
+   *
+   * <p>This field should not be used in human written Galaxy workflow files.
+   *
+   * <p>A typical problem is the referenced tool is not installed, this can be fixed by installed
+   * the tool and re-saving the workflow and then re-exporting it. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<String> getErrors() {
+    return this.errors;
+  }
+
+  private java.util.Optional<String> uuid;
+
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/gxformat2common#HasUUID/uuid</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * UUID uniquely representing this element. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<String> getUuid() {
+    return this.uuid;
+  }
+
   private java.util.Optional<java.util.List<Object>> in;
 
   /**
@@ -152,7 +203,10 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
    * <BLOCKQUOTE>
    *
    * Defines the parameters representing the output of the process. May be used to generate and/or
-   * validate the output object. *
+   * validate the output object.
+   *
+   * <p>This can also be called 'outputs' for legacy reasons - but the resulting workflow document
+   * is not a valid instance of this schema. *
    *
    * </BLOCKQUOTE>
    */
@@ -163,7 +217,7 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
   private java.util.Optional<Object> state;
 
   /**
-   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#WorkflowStep/state</I><br>
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#state</I><br>
    *
    * <BLOCKQUOTE>
    *
@@ -173,6 +227,21 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
    */
   public java.util.Optional<Object> getState() {
     return this.state;
+  }
+
+  private java.util.Optional<Object> tool_state;
+
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#tool_state</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * Unstructured tool state. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<Object> getTool_state() {
+    return this.tool_state;
   }
 
   private java.util.Optional<WorkflowStepType> type;
@@ -203,6 +272,16 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
    */
   public java.util.Optional<GalaxyWorkflow> getRun() {
     return this.run;
+  }
+
+  private java.util.Optional<java.util.List<Object>> runtime_inputs;
+
+  /**
+   * Getter for property
+   * <I>https://galaxyproject.org/gxformat2/v19_09#WorkflowStep/runtime_inputs</I><br>
+   */
+  public java.util.Optional<java.util.List<Object>> getRuntime_inputs() {
+    return this.runtime_inputs;
   }
 
   /**
@@ -357,6 +436,38 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
     } else {
       tool_version = null;
     }
+    java.util.Optional<String> errors;
+
+    if (__doc.containsKey("errors")) {
+      try {
+        errors =
+            LoaderInstances.optional_StringInstance.loadField(
+                __doc.get("errors"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        errors = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `errors` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      errors = null;
+    }
+    java.util.Optional<String> uuid;
+
+    if (__doc.containsKey("uuid")) {
+      try {
+        uuid =
+            LoaderInstances.optional_StringInstance.loadField(
+                __doc.get("uuid"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        uuid = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `uuid` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      uuid = null;
+    }
     java.util.Optional<java.util.List<Object>> in;
 
     if (__doc.containsKey("in")) {
@@ -379,7 +490,7 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
       try {
         out =
             LoaderInstances
-                .uri_optional_array_of_union_of_StringInstance_or_WorkflowStepOutput_True_False_None
+                .idmap_out_optional_array_of_union_of_StringInstance_or_WorkflowStepOutput
                 .loadField(__doc.get("out"), __baseUri, __loadingOptions);
       } catch (ValidationException e) {
         out = null; // won't be used but prevents compiler from complaining.
@@ -405,6 +516,22 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
 
     } else {
       state = null;
+    }
+    java.util.Optional<Object> tool_state;
+
+    if (__doc.containsKey("tool_state")) {
+      try {
+        tool_state =
+            LoaderInstances.optional_AnyInstance.loadField(
+                __doc.get("tool_state"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        tool_state = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `tool_state` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      tool_state = null;
     }
     java.util.Optional<WorkflowStepType> type;
 
@@ -438,6 +565,22 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
     } else {
       run = null;
     }
+    java.util.Optional<java.util.List<Object>> runtime_inputs;
+
+    if (__doc.containsKey("runtime_inputs")) {
+      try {
+        runtime_inputs =
+            LoaderInstances.optional_array_of_StringInstance.loadField(
+                __doc.get("runtime_inputs"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        runtime_inputs = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `runtime_inputs` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      runtime_inputs = null;
+    }
     if (!__errors.isEmpty()) {
       throw new ValidationException("Trying 'RecordField'", __errors);
     }
@@ -448,10 +591,14 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
     this.tool_id = (java.util.Optional<String>) tool_id;
     this.tool_shed_repository = (java.util.Optional<ToolShedRepository>) tool_shed_repository;
     this.tool_version = (java.util.Optional<String>) tool_version;
+    this.errors = (java.util.Optional<String>) errors;
+    this.uuid = (java.util.Optional<String>) uuid;
     this.in = (java.util.Optional<java.util.List<Object>>) in;
     this.out = (java.util.Optional<java.util.List<Object>>) out;
     this.state = (java.util.Optional<Object>) state;
+    this.tool_state = (java.util.Optional<Object>) tool_state;
     this.type = (java.util.Optional<WorkflowStepType>) type;
     this.run = (java.util.Optional<GalaxyWorkflow>) run;
+    this.runtime_inputs = (java.util.Optional<java.util.List<Object>>) runtime_inputs;
   }
 }

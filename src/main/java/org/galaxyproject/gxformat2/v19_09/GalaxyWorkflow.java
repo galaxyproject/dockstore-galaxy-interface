@@ -8,11 +8,23 @@ import org.galaxyproject.gxformat2.v19_09.utils.Savable;
  *
  * <BLOCKQUOTE>
  *
- * This is documentation for a workflow!
+ * A Galaxy workflow description. This record corresponds to the description of a workflow that
+ * should be executable on a Galaxy server that includes the contained tool definitions.
+ *
+ * <p>The workflows API or the user interface of Galaxy instances that are of version 19.09 or newer
+ * should be able to import a document defining this record.
+ *
+ * <p>## A note about `label` field.
+ *
+ * <p>This is the name of the workflow in the Galaxy user interface. This is the mechanism that
+ * users will primarily identify the workflow using. Legacy support - this may also be called 'name'
+ * and Galaxy will consume the workflow document fine and treat this attribute correctly - however
+ * in order to validate against this workflow definition schema the attribute should be called
+ * `label`.
  *
  * </BLOCKQUOTE>
  */
-public interface GalaxyWorkflow extends Process, Savable {
+public interface GalaxyWorkflow extends Process, HasUUID, Savable {
   /**
    * Getter for property <I>https://w3id.org/cwl/cwl#Identified/id</I><br>
    *
@@ -73,6 +85,16 @@ public interface GalaxyWorkflow extends Process, Savable {
    */
   java.util.List<Object> getOutputs();
   /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/gxformat2common#HasUUID/uuid</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * UUID uniquely representing this element. *
+   *
+   * </BLOCKQUOTE>
+   */
+  java.util.Optional<String> getUuid();
+  /**
    * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#GalaxyWorkflow/class</I><br>
    */
   String getClass_();
@@ -87,4 +109,14 @@ public interface GalaxyWorkflow extends Process, Savable {
    * </BLOCKQUOTE>
    */
   java.util.List<Object> getSteps();
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#GalaxyWorkflow/report</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * Workflow invocation report template. *
+   *
+   * </BLOCKQUOTE>
+   */
+  java.util.Optional<Report> getReport();
 }
