@@ -20,8 +20,16 @@
 <span class="sourceLineNo">011</span><a id="line.11">    } catch (ValidationException e) {</a>
 <span class="sourceLineNo">012</span><a id="line.12">      lintContext.error("Validation failed " + e.toString());</a>
 <span class="sourceLineNo">013</span><a id="line.13">    }</a>
-<span class="sourceLineNo">014</span><a id="line.14">  }</a>
-<span class="sourceLineNo">015</span><a id="line.15">}</a>
+<span class="sourceLineNo">014</span><a id="line.14">    final Map&lt;String, Object&gt; steps = LintUtils.stepMap(lintContext, workflow);</a>
+<span class="sourceLineNo">015</span><a id="line.15">    for (Map.Entry&lt;String, Object&gt; stepEntry : steps.entrySet()) {</a>
+<span class="sourceLineNo">016</span><a id="line.16">      if (!(stepEntry.getValue() instanceof Map)) {</a>
+<span class="sourceLineNo">017</span><a id="line.17">        continue;</a>
+<span class="sourceLineNo">018</span><a id="line.18">      }</a>
+<span class="sourceLineNo">019</span><a id="line.19">      Map&lt;String, Object&gt; step = (Map&lt;String, Object&gt;) stepEntry.getValue();</a>
+<span class="sourceLineNo">020</span><a id="line.20">      LintUtils.lintStepErrors(lintContext, step);</a>
+<span class="sourceLineNo">021</span><a id="line.21">    }</a>
+<span class="sourceLineNo">022</span><a id="line.22">  }</a>
+<span class="sourceLineNo">023</span><a id="line.23">}</a>
 
 
 
