@@ -1,0 +1,114 @@
+name: My Cool Workflow
+inputs:
+  input_1: data
+  image_input: data
+  input_list: collection
+outputs:
+  output_1:
+    outputSource: first_cat/out_file1
+  output_image:
+    outputSource: image_cat/out_file1
+steps:
+  '0':
+    annotation: ''
+    id: 0
+    input_connections: {}
+    inputs:
+    - description: ''
+      name: input_1
+    label: input_1
+    position:
+      left: 0
+      top: 0
+    tool_state: '{"name": "input_1"}'
+    type: data_input
+  '1':
+    annotation: ''
+    id: 1
+    input_connections: {}
+    inputs:
+    - description: ''
+      name: image_input
+    label: image_input
+    position:
+      left: 10
+      top: 10
+    tool_state: '{"name": "image_input"}'
+    type: data_input
+  '2':
+    annotation: ''
+    id: 2
+    input_connections: {}
+    inputs:
+    - description: ''
+      name: input_list
+    label: input_list
+    position:
+      left: 20
+      top: 20
+    tool_state: '{"name": "input_list"}'
+    type: data_collection_input
+  '3':
+    tool_id: cat
+    label: first_cat
+    id: 3
+    position:
+      left: 30
+      top: 30
+    type: tool
+    name: cat
+    post_job_actions: {}
+    tool_version: null
+    annotation: ''
+    input_connections:
+      input1:
+      - id: 0
+        output_name: output
+    tool_state: '{"__page__": 0}'
+    workflow_outputs:
+    - label: output_1
+      output_name: out_file1
+      uuid: null
+  '4':
+    tool_id: cat
+    label: image_cat
+    id: 4
+    position:
+      left: 40
+      top: 40
+    type: tool
+    name: cat
+    post_job_actions: {}
+    tool_version: null
+    annotation: ''
+    input_connections:
+      input1:
+      - id: 1
+        output_name: output
+    tool_state: '{"__page__": 0}'
+    workflow_outputs:
+    - label: output_image
+      output_name: out_file1
+      uuid: null
+  '5':
+    tool_id: qc_stdout
+    label: qc_step
+    id: 5
+    position:
+      left: 50
+      top: 50
+    type: tool
+    name: qc_stdout
+    post_job_actions: {}
+    tool_version: null
+    annotation: ''
+    input_connections:
+      input:
+      - id: 0
+        output_name: output
+    tool_state: '{"__page__": 0, "quality": "9"}'
+report: {}
+a_galaxy_workflow: 'true'
+format-version: '0.1'
+uuid: 8e4918d5-b3d6-407d-9623-eabe2a966d3f
+annotation: ''

@@ -80,6 +80,24 @@ public class GalaxyWorkflowLanguagePluginTest {
     // <annotation>", or
     // "<name>/n<annotation>".
     Assert.assertEquals("Test Workflow", metadata.getDescription());
+
+    final VersionTypeValidation wfValidation =
+        plugin.validateWorkflowSet(initialPath, contents, fileMap);
+    Assert.assertTrue(wfValidation.isValid());
+  }
+
+  @Test
+  public void testValidationIssues() {
+    final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+    final ResourceFileReader reader = new ResourceFileReader("invalid_report_ga");
+    final String initialPath = "missing_markdown.ga";
+    final String contents = reader.readFile(initialPath);
+    final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap =
+        plugin.indexWorkflowFiles(initialPath, contents, reader);
+    Assert.assertEquals(0, fileMap.size());
+    final VersionTypeValidation wfValidation =
+        plugin.validateWorkflowSet(initialPath, contents, fileMap);
+    Assert.assertFalse(wfValidation.isValid());
   }
 
   @Test
@@ -104,12 +122,14 @@ public class GalaxyWorkflowLanguagePluginTest {
     Assert.assertFalse(m.matches());
   }
 
-  class HttpFileReader implements MinimalLanguageInterface.FileReader {
-    private final String repo;
+  abstract class URLFileReader implements MinimalLanguageInterface.FileReader {
+    protected final String repo;
 
-    HttpFileReader(final String repo) {
+    URLFileReader(final String repo) {
       this.repo = repo;
     }
+
+    protected abstract URL getUrl(final String path) throws IOException;
 
     @Override
     public String readFile(String path) {
@@ -117,10 +137,40 @@ public class GalaxyWorkflowLanguagePluginTest {
         if (path.startsWith("/")) {
           path = path.substring(1);
         }
-        return Resources.toString(new URL(this.repo + "/master/" + path), StandardCharsets.UTF_8);
+        URL url = this.getUrl(path);
+        return Resources.toString(url, StandardCharsets.UTF_8);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
+    }
+  }
+
+  class ResourceFileReader extends URLFileReader {
+
+    ResourceFileReader(final String repo) {
+      super(repo);
+    }
+
+    @Override
+    protected URL getUrl(String path) throws IOException {
+      final String classPath = "repos/" + this.repo + "/" + path;
+      final URL url = GalaxyWorkflowLanguagePluginTest.class.getResource(classPath);
+      if (url == null) {
+        throw new IOException("No such file " + classPath);
+      }
+      return url;
+    }
+  }
+
+  class HttpFileReader extends URLFileReader {
+
+    HttpFileReader(final String repo) {
+      super(repo);
+    }
+
+    @Override
+    protected URL getUrl(final String path) throws IOException {
+      return new URL(this.repo + "/master/" + path);
     }
   }
 }
