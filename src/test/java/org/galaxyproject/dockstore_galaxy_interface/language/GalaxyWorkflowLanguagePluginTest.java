@@ -55,6 +55,8 @@ public class GalaxyWorkflowLanguagePluginTest {
     Assert.assertTrue(wfValidation.isValid());
     final VersionTypeValidation testValidation = plugin.validateTestParameterSet(fileMap);
     Assert.assertTrue(testValidation.isValid());
+    // No validation messages because everything is fine...
+    Assert.assertTrue(wfValidation.getMessage().isEmpty());
   }
 
   @Test
@@ -84,6 +86,8 @@ public class GalaxyWorkflowLanguagePluginTest {
     final VersionTypeValidation wfValidation =
         plugin.validateWorkflowSet(initialPath, contents, fileMap);
     Assert.assertTrue(wfValidation.isValid());
+    // No validation messages because everything is fine...
+    Assert.assertTrue(wfValidation.getMessage().isEmpty());
   }
 
   @Test
@@ -98,6 +102,10 @@ public class GalaxyWorkflowLanguagePluginTest {
     final VersionTypeValidation wfValidation =
         plugin.validateWorkflowSet(initialPath, contents, fileMap);
     Assert.assertFalse(wfValidation.isValid());
+    final Map<String, String> messages = wfValidation.getMessage();
+    Assert.assertTrue(messages.containsKey(initialPath));
+    final String validationProblem = messages.get(initialPath);
+    Assert.assertTrue(validationProblem.indexOf("markdown") > 0);
   }
 
   @Test
