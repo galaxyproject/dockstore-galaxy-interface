@@ -40,7 +40,21 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
     } else {
       valid = true;
     }
-    final VersionTypeValidation validation = new VersionTypeValidation(valid, new HashMap<>());
+    final Map<String, String> messagesAsMap = new HashMap<>();
+    final List<String> validationMessages = lintContext.collectMessages();
+    final StringBuilder builder = new StringBuilder();
+    if (validationMessages.size() == 1) {
+      builder.append(validationMessages.get(0));
+    } else if (validationMessages.size() > 2) {
+      for (final String validationMessage : validationMessages) {
+        builder.append("- " + validationMessage + "\n");
+      }
+    }
+    final String validationMessageMerged = builder.toString();
+    if (validationMessageMerged.length() > 0) {
+      messagesAsMap.put(initialPath, validationMessageMerged);
+    }
+    final VersionTypeValidation validation = new VersionTypeValidation(valid, messagesAsMap);
     return validation;
   }
 
