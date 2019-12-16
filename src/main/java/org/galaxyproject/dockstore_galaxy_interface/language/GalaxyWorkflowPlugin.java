@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.galaxyproject.gxformat2.Cytoscape;
 import org.galaxyproject.gxformat2.Lint;
 import org.galaxyproject.gxformat2.LintContext;
 import org.slf4j.Logger;
@@ -26,6 +27,14 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
   @Override
   public String launchInstructions(String trsID) {
     return null;
+  }
+
+  public List<Map<String, Object>> loadCytoscapeElements(
+      String initialPath,
+      String contents,
+      Map<String, Pair<String, GenericFileType>> indexedFiles) {
+    final Map<String, Object> workflow = loadWorkflow(contents);
+    return Cytoscape.getElements(workflow);
   }
 
   @Override
