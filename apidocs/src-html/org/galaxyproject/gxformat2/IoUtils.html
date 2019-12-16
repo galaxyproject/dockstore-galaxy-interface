@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">package org.galaxyproject.gxformat2;</a>
+<span class="sourceLineNo">002</span><a id="line.2"></a>
+<span class="sourceLineNo">003</span><a id="line.3">import java.io.IOException;</a>
+<span class="sourceLineNo">004</span><a id="line.4">import java.nio.file.Files;</a>
+<span class="sourceLineNo">005</span><a id="line.5">import java.nio.file.Path;</a>
+<span class="sourceLineNo">006</span><a id="line.6">import java.nio.file.Paths;</a>
+<span class="sourceLineNo">007</span><a id="line.7">import org.yaml.snakeyaml.Yaml;</a>
+<span class="sourceLineNo">008</span><a id="line.8"></a>
+<span class="sourceLineNo">009</span><a id="line.9">public class IoUtils {</a>
+<span class="sourceLineNo">010</span><a id="line.10"></a>
+<span class="sourceLineNo">011</span><a id="line.11">  public static Object readYamlFromPath(final String pathAsString) throws IOException {</a>
+<span class="sourceLineNo">012</span><a id="line.12">    final Path path = Paths.get(pathAsString);</a>
+<span class="sourceLineNo">013</span><a id="line.13">    return readYamlFromPath(path);</a>
+<span class="sourceLineNo">014</span><a id="line.14">  }</a>
+<span class="sourceLineNo">015</span><a id="line.15"></a>
+<span class="sourceLineNo">016</span><a id="line.16">  public static Object readYamlFromPath(final Path path) throws IOException {</a>
+<span class="sourceLineNo">017</span><a id="line.17">    final String workflowContents = new String(Files.readAllBytes(path), "UTF8");</a>
+<span class="sourceLineNo">018</span><a id="line.18">    final Yaml yaml = new Yaml();</a>
+<span class="sourceLineNo">019</span><a id="line.19">    return yaml.load(workflowContents);</a>
+<span class="sourceLineNo">020</span><a id="line.20">  }</a>
+<span class="sourceLineNo">021</span><a id="line.21">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>
