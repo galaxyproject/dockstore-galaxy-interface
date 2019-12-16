@@ -12,3 +12,4 @@ do
 done
 # Depends on files not copied over yet...
 rm "src/test/java/${package}/LintExamplesTest.java"
+rm "src/test/java/${package}/CytoscapeExamplesTest.java"
