@@ -10,7 +10,7 @@
 
     <properties>
         <github.url>scm:git:git@github.com:jmchilton/dockstore-galaxy-interface.git</github.url>
-        <dockstore.version>1.8.0-alpha.3-SNAPSHOT</dockstore.version>
+        <dockstore.version>1.8.0-alpha.3-GALAXYEXP</dockstore.version>
         <slf4j.version>1.7.26</slf4j.version>
     </properties>
 
