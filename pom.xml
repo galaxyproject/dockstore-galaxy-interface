@@ -6,7 +6,7 @@
     <artifactId>dockstore-galaxy-interface</artifactId>
     <packaging>jar</packaging>
     <name>dockstore-galaxy-interface</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <properties>
         <github.url>scm:git:git@github.com:galaxyproject/dockstore-galaxy-interface.git</github.url>
@@ -26,7 +26,7 @@
         <connection>${github.url}</connection>
         <developerConnection>${github.url}</developerConnection>
         <url>${github.url}</url>
-        <tag>1.1.3</tag>
+        <tag>dockstore-galaxy-interface-0.0.1</tag>
     </scm>
 
     <repositories>
