@@ -1,23 +1,31 @@
 package org.galaxyproject.dockstore_galaxy_interface.language;
 
 import com.google.common.io.Resources;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.dockstore.common.VersionTypeValidation;
 import io.dockstore.language.MinimalLanguageInterface;
 import io.dockstore.language.RecommendedLanguageInterface;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class GalaxyWorkflowLanguagePluginTest {
-  public static final String REPO_FORMAT_2 =
-      "https://raw.githubusercontent.com/jmchilton/galaxy-workflow-dockstore-example-1";
-  public static final String REPO_NATIVE =
-      "https://raw.githubusercontent.com/jmchilton/galaxy-workflow-dockstore-example-2";
+  public static final String REPO_ID_1 = "jmchilton/galaxy-workflow-dockstore-example-1";
+  public static final String REPO_FORMAT_2 = "https://raw.githubusercontent.com/" + REPO_ID_1;
+  public static final String REPO_ID_2 = "jmchilton/galaxy-workflow-dockstore-example-2";
+  public static final String REPO_NATIVE = "https://raw.githubusercontent.com/" + REPO_ID_2;
   public static final String EXAMPLE_FILENAME_1 = "Dockstore.gxwf.yml";
   public static final String EXAMPLE_FILENAME_1_PATH = "/" + EXAMPLE_FILENAME_1;
   public static final String EXAMPLE_FILENAME_2 = "Dockstore.gxwf.yaml";
@@ -25,6 +33,7 @@ public class GalaxyWorkflowLanguagePluginTest {
 
   public static final String EXAMPLE_FILENAME_NATIVE = "Dockstore.ga";
   public static final String EXAMPLE_FILENAME_NATIVE_PATH = "/" + EXAMPLE_FILENAME_NATIVE;
+  public static final String CURRENT_BRANCH = "master";
 
   @Test
   public void testFormat2WorkflowParsing() {
@@ -42,8 +51,8 @@ public class GalaxyWorkflowLanguagePluginTest {
     final RecommendedLanguageInterface.WorkflowMetadata metadata =
         plugin.parseWorkflowForMetadata(initialPath, contents, fileMap);
     // We don't track these currently, but we could pull out the CWL parsing and mimic that.
-    Assert.assertEquals(null, metadata.getAuthor());
-    Assert.assertEquals(null, metadata.getEmail());
+    Assert.assertNull(metadata.getAuthor());
+    Assert.assertNull(metadata.getEmail());
     // We have name and annotation - not sure if this should just be "<name>"", or "<name>.
     // <annotation>", or
     // "<name>/n<annotation>".
@@ -76,8 +85,8 @@ public class GalaxyWorkflowLanguagePluginTest {
         plugin.parseWorkflowForMetadata(initialPath, contents, fileMap);
 
     // We don't track these currently - especially with native format.
-    Assert.assertEquals(null, metadata.getAuthor());
-    Assert.assertEquals(null, metadata.getEmail());
+    Assert.assertNull(metadata.getAuthor());
+    Assert.assertNull(metadata.getEmail());
     // We have name and annotation - not sure if this should just be "<name>"", or "<name>.
     // <annotation>", or
     // "<name>/n<annotation>".
@@ -130,11 +139,20 @@ public class GalaxyWorkflowLanguagePluginTest {
     Assert.assertFalse(m.matches());
   }
 
-  abstract class URLFileReader implements MinimalLanguageInterface.FileReader {
+  abstract static class URLFileReader implements MinimalLanguageInterface.FileReader {
+    // URL to repo
     protected final String repo;
+    // extracted ID
+    protected final Optional<String> id;
 
     URLFileReader(final String repo) {
       this.repo = repo;
+      final String[] split = repo.split("/");
+      if (split.length >= 2) {
+        id = Optional.of(split[split.length - 2] + "/" + split[split.length - 1]);
+      } else {
+        id = Optional.empty();
+      }
     }
 
     protected abstract URL getUrl(final String path) throws IOException;
@@ -151,9 +169,26 @@ public class GalaxyWorkflowLanguagePluginTest {
         throw new RuntimeException(e);
       }
     }
+
+    @Override
+    public List<String> listFiles(String pathToDirectory) {
+      if (id.isEmpty()) {
+        return new ArrayList<>();
+      }
+      Gson gson = new GsonBuilder().create();
+      try {
+        final String fileContent =
+            FileUtils.readFileToString(
+                new File("src/test/resources/" + this.id.get() + "/listing.json"));
+        return gson.fromJson(
+            fileContent, TypeToken.getParameterized(List.class, String.class).getType());
+      } catch (IOException e) {
+        throw new RuntimeException("test failed to read directory listing");
+      }
+    }
   }
 
-  class ResourceFileReader extends URLFileReader {
+  static class ResourceFileReader extends URLFileReader {
 
     ResourceFileReader(final String repo) {
       super(repo);
@@ -170,7 +205,7 @@ public class GalaxyWorkflowLanguagePluginTest {
     }
   }
 
-  class HttpFileReader extends URLFileReader {
+  static class HttpFileReader extends URLFileReader {
 
     HttpFileReader(final String repo) {
       super(repo);
@@ -178,7 +213,7 @@ public class GalaxyWorkflowLanguagePluginTest {
 
     @Override
     protected URL getUrl(final String path) throws IOException {
-      return new URL(this.repo + "/master/" + path);
+      return new URL(this.repo + "/" + CURRENT_BRANCH + "/" + path);
     }
   }
 }

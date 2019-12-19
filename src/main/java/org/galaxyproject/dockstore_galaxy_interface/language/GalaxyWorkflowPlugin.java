@@ -1,11 +1,16 @@
 package org.galaxyproject.dockstore_galaxy_interface.language;
 
+import com.google.common.collect.Sets;
 import io.dockstore.common.VersionTypeValidation;
+import io.dockstore.language.CompleteLanguageInterface;
 import io.dockstore.language.RecommendedLanguageInterface;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -19,7 +24,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
 /** @author jmchilton */
-public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
+public class GalaxyWorkflowPlugin implements CompleteLanguageInterface {
   public static final Logger LOG = LoggerFactory.getLogger(GalaxyWorkflowPlugin.class);
   public static final String[] TEST_SUFFIXES = {"-tests", "_tests", "-test", "-tests"};
   public static final String[] TEST_EXTENSIONS = {".yml", ".yaml", ".json"};
@@ -29,6 +34,7 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
     return null;
   }
 
+  @Override
   public List<Map<String, Object>> loadCytoscapeElements(
       String initialPath,
       String contents,
@@ -38,17 +44,21 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
   }
 
   @Override
+  public List<RowData> generateToolsTable(
+      String initialPath,
+      String contents,
+      Map<String, Pair<String, GenericFileType>> indexedFiles) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public VersionTypeValidation validateWorkflowSet(
       String initialPath,
       String contents,
       Map<String, Pair<String, GenericFileType>> indexedFiles) {
     final LintContext lintContext = Lint.lint(loadWorkflow(contents));
     final boolean valid;
-    if (lintContext.getFoundErrors()) {
-      valid = false;
-    } else {
-      valid = true;
-    }
+    valid = !lintContext.getFoundErrors();
     final Map<String, String> messagesAsMap = new HashMap<>();
     final List<String> validationMessages = lintContext.collectMessages();
     final StringBuilder builder = new StringBuilder();
@@ -56,7 +66,7 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
       builder.append(validationMessages.get(0));
     } else if (validationMessages.size() > 2) {
       for (final String validationMessage : validationMessages) {
-        builder.append("- " + validationMessage + "\n");
+        builder.append("- ").append(validationMessage).append("\n");
       }
     }
     final String validationMessageMerged = builder.toString();
@@ -96,10 +106,17 @@ public class GalaxyWorkflowPlugin implements RecommendedLanguageInterface {
       final String initialPath, final FileReader reader) {
     final int extensionPos = initialPath.lastIndexOf(".");
     final String base = initialPath.substring(0, extensionPos);
+
+    final Path parent = Paths.get(initialPath).getParent();
+    // listing files is more rate limit friendly (e.g. GitHub counts each 404 "miss" as an API call,
+    // but listing a directory can be free if previously requested/cached)
+    final Set<String> filenameset =
+        parent == null ? Sets.newHashSet() : Sets.newHashSet(reader.listFiles(parent.toString()));
+
     for (final String suffix : TEST_SUFFIXES) {
       for (final String extension : TEST_EXTENSIONS) {
         final String testFile = base + suffix + extension;
-        if (pathExistsFromReader(reader, testFile)) {
+        if (filenameset.contains(testFile)) {
           return Optional.of(testFile);
         }
       }
