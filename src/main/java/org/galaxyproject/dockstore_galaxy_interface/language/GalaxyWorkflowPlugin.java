@@ -64,7 +64,7 @@ public class GalaxyWorkflowPlugin implements CompleteLanguageInterface {
     final StringBuilder builder = new StringBuilder();
     if (validationMessages.size() == 1) {
       builder.append(validationMessages.get(0));
-    } else if (validationMessages.size() > 2) {
+    } else if (validationMessages.size() > 1) {
       for (final String validationMessage : validationMessages) {
         builder.append("- ").append(validationMessage).append("\n");
       }
