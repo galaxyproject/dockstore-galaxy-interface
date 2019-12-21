@@ -118,6 +118,24 @@ public class GalaxyWorkflowLanguagePluginTest {
   }
 
   @Test
+  public void testTwoValidationIssues() {
+    final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+    final ResourceFileReader reader = new ResourceFileReader("invalid_report_ga");
+    final String initialPath = "two_validation_errors.ga";
+    final String contents = reader.readFile(initialPath);
+    final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap =
+            plugin.indexWorkflowFiles(initialPath, contents, reader);
+    Assert.assertEquals(0, fileMap.size());
+    final VersionTypeValidation wfValidation =
+            plugin.validateWorkflowSet(initialPath, contents, fileMap);
+    Assert.assertFalse(wfValidation.isValid());
+    final Map<String, String> messages = wfValidation.getMessage();
+    final String validationProblem = messages.get(initialPath);
+    Assert.assertTrue(validationProblem.contains("- .. ERROR"));
+    Assert.assertTrue(validationProblem.contains("- .. WARNING"));
+  }
+
+  @Test
   public void testIsNotAService() {
     final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
     Assert.assertFalse(plugin.isService());

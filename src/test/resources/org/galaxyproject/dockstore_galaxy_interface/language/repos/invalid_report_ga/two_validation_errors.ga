@@ -1,0 +1,14 @@
+name: My Cool Workflow
+inputs:
+  input_1: data
+  image_input: data
+  input_list: collection
+outputs:
+  output_1:
+    outputSource: first_cat/out_file1
+  output_image:
+    outputSource: image_cat/out_file1
+a_galaxy_workflow: 'true'
+format-version: '0.1'
+uuid: 8e4918d5-b3d6-407d-9623-eabe2a966d3f
+annotation: ''
