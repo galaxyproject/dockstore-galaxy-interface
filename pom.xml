@@ -10,8 +10,13 @@
 
     <properties>
         <github.url>scm:git:git@github.com:galaxyproject/dockstore-galaxy-interface.git</github.url>
-        <dockstore.version>1.8.0-alpha.3-GALAXYEXP</dockstore.version>
+        <dockstore.version>1.9.0-alpha.0-SNAPSHOT</dockstore.version>
         <slf4j.version>1.7.26</slf4j.version>
+        <plugin.id>${project.artifactId}</plugin.id>
+        <plugin.class>org.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkflowPlugin</plugin.class>
+        <plugin.version>${project.version}</plugin.version>
+        <plugin.provider>jmchilton</plugin.provider>
+        <plugin.dependencies />
     </properties>
 
     <distributionManagement>
@@ -61,7 +66,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <release>11</release>
                         <showDeprecation>true</showDeprecation>
@@ -106,6 +111,26 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Plugin-Id>${plugin.id}</Plugin-Id>
+                            <Plugin-Class>${plugin.class}</Plugin-Class>
+                            <Plugin-Version>${plugin.version}</Plugin-Version>
+                            <Plugin-Provider>${plugin.provider}</Plugin-Provider>
+                            <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -131,6 +156,13 @@
             <version>${dockstore.version}</version>
             <!-- !!! VERY IMPORTANT -->
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.pf4j</groupId>
+            <artifactId>pf4j</artifactId>
+            <!-- !!! VERY IMPORTANT -->
+            <scope>provided</scope>
+            <version>3.2.0</version>
         </dependency>
 
         <dependency>
