@@ -37,7 +37,8 @@ public class GalaxyWorkflowLanguagePluginTest {
 
   @Test
   public void testFormat2WorkflowParsing() {
-    final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+        new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
     final HttpFileReader reader = new HttpFileReader(REPO_FORMAT_2);
     final String initialPath = EXAMPLE_FILENAME_1_PATH;
     final String contents = reader.readFile(EXAMPLE_FILENAME_1);
@@ -70,7 +71,8 @@ public class GalaxyWorkflowLanguagePluginTest {
 
   @Test
   public void testNativeWorkflowParsing() {
-    final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+        new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
     final HttpFileReader reader = new HttpFileReader(REPO_NATIVE);
     final String initialPath = EXAMPLE_FILENAME_NATIVE_PATH;
     final String contents = reader.readFile(EXAMPLE_FILENAME_NATIVE);
@@ -101,7 +103,8 @@ public class GalaxyWorkflowLanguagePluginTest {
 
   @Test
   public void testValidationIssues() {
-    final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+        new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
     final ResourceFileReader reader = new ResourceFileReader("invalid_report_ga");
     final String initialPath = "missing_markdown.ga";
     final String contents = reader.readFile(initialPath);
@@ -119,15 +122,16 @@ public class GalaxyWorkflowLanguagePluginTest {
 
   @Test
   public void testTwoValidationIssues() {
-    final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+        new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
     final ResourceFileReader reader = new ResourceFileReader("invalid_report_ga");
     final String initialPath = "two_validation_errors.ga";
     final String contents = reader.readFile(initialPath);
     final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap =
-            plugin.indexWorkflowFiles(initialPath, contents, reader);
+        plugin.indexWorkflowFiles(initialPath, contents, reader);
     Assert.assertEquals(0, fileMap.size());
     final VersionTypeValidation wfValidation =
-            plugin.validateWorkflowSet(initialPath, contents, fileMap);
+        plugin.validateWorkflowSet(initialPath, contents, fileMap);
     Assert.assertFalse(wfValidation.isValid());
     final Map<String, String> messages = wfValidation.getMessage();
     final String validationProblem = messages.get(initialPath);
@@ -136,15 +140,10 @@ public class GalaxyWorkflowLanguagePluginTest {
   }
 
   @Test
-  public void testIsNotAService() {
-    final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
-    Assert.assertFalse(plugin.isService());
-  }
-
-  @Test
   public void testInitialPathPattern() {
     // TODO: This doesn't seem to be called by Dockstore anywhere - is that right?
-    final GalaxyWorkflowPlugin plugin = new GalaxyWorkflowPlugin();
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+        new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
     Matcher m = plugin.initialPathPattern().matcher(EXAMPLE_FILENAME_1_PATH);
     Assert.assertTrue("File name matches for initial path pattern", m.matches());
     m = plugin.initialPathPattern().matcher(EXAMPLE_FILENAME_2_PATH);
