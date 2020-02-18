@@ -1,7 +1,7 @@
 package org.galaxyproject.gxformat2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +9,12 @@ import java.util.Map;
 public class Cytoscape {
   public static final String MAIN_TS_PREFIX = "toolshed.g2.bx.psu.edu/repos/";
 
-  public static List<Map<String, Object>> getElements(final String path) throws Exception {
+  public static Map<String, Object> getElements(final String path) throws Exception {
     final Map<String, Object> object = (Map<String, Object>) IoUtils.readYamlFromPath(path);
     return getElements(object);
   }
 
-  public static List<Map<String, Object>> getElements(final Map<String, Object> object) {
+  public static Map<String, Object> getElements(final Map<String, Object> object) {
     final String wfClass = (String) object.get("class");
     WorkflowAdapter adapter;
     if (wfClass == null) {
@@ -23,13 +23,18 @@ public class Cytoscape {
       adapter = new Format2WorkflowAdapter(object);
     }
     int orderIndex = 0;
-    final List<Map<String, Object>> elements = new ArrayList<>();
+    final Map<String, Object> elements = new HashMap<>();
+    final List<Object> nodeElements = new ArrayList<>();
+    final List<Object> edgeElements = new ArrayList<>();
+    elements.put("nodes", nodeElements);
+    elements.put("edges", edgeElements);
+
     for (final WorkflowAdapter.NormalizedStep normalizedStep : adapter.normalizedSteps()) {
       final Map<String, Object> step = normalizedStep.stepDefinition;
       String stepId =
           step.get("label") != null ? (String) step.get("label") : Integer.toString(orderIndex);
       String stepType = step.get("type") != null ? (String) step.get("type") : "tool";
-      List<String> classes = new ArrayList<>(Arrays.asList("type_" + stepType));
+      List<String> classes = new ArrayList<>(Collections.singletonList("type_" + stepType));
       if (stepType.equals("tool") || stepType.equals("subworkflow")) {
         classes.add("runnable");
       } else {
@@ -61,6 +66,12 @@ public class Cytoscape {
       final Map<String, Object> nodeData = new HashMap<String, Object>();
       nodeData.put("id", stepId);
       nodeData.put("label", label);
+      // dockstore displays name, docker, type, tool, and run
+      nodeData.put("name", label);
+      // TODO: detect Docker image properly
+      nodeData.put("docker", "TBD");
+      nodeData.put("run", "TBD");
+
       nodeData.put("tool_id", step.get("tool_id"));
       nodeData.put("doc", normalizedStep.doc);
       nodeData.put("repo_link", repoLink);
@@ -70,7 +81,7 @@ public class Cytoscape {
       nodeElement.put("data", nodeData);
       nodeElement.put("classes", classes);
       nodeElement.put("position", elementPosition(step));
-      elements.add(nodeElement);
+      nodeElements.add(nodeElement);
 
       for (final WorkflowAdapter.Input input : normalizedStep.inputs) {
         final String edgeId = stepId + "__to__" + input.sourceStepLabel;
@@ -83,10 +94,11 @@ public class Cytoscape {
         final Map<String, Object> edgeElement = new HashMap<>();
         edgeElement.put("group", "edges");
         edgeElement.put("data", edgeData);
-        elements.add(edgeElement);
+        edgeElements.add(edgeElement);
       }
       orderIndex++;
     }
+
     return elements;
   }
 

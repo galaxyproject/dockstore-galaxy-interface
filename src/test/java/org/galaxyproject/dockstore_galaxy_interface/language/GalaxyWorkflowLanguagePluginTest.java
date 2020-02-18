@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.dockstore.common.VersionTypeValidation;
+import io.dockstore.language.CompleteLanguageInterface;
 import io.dockstore.language.MinimalLanguageInterface;
 import io.dockstore.language.RecommendedLanguageInterface;
 import java.io.File;
@@ -67,6 +68,16 @@ public class GalaxyWorkflowLanguagePluginTest {
     Assert.assertTrue(testValidation.isValid());
     // No validation messages because everything is fine...
     Assert.assertTrue(wfValidation.getMessage().isEmpty());
+
+    final Map<String, Object> cytoscapeElements =
+        plugin.loadCytoscapeElements(initialPath, contents, fileMap);
+    // do a sanity check for a valid cytoscape JSON
+    // http://manual.cytoscape.org/en/stable/Supported_Network_File_Formats.html#cytoscape-js-json
+    Assert.assertTrue(
+        cytoscapeElements.containsKey("nodes") && cytoscapeElements.containsKey("edges"));
+    final List<CompleteLanguageInterface.RowData> rowData =
+        plugin.generateToolsTable(initialPath, contents, fileMap);
+    Assert.assertFalse(rowData.isEmpty());
   }
 
   @Test
@@ -99,6 +110,17 @@ public class GalaxyWorkflowLanguagePluginTest {
     Assert.assertTrue(wfValidation.isValid());
     // No validation messages because everything is fine...
     Assert.assertTrue(wfValidation.getMessage().isEmpty());
+
+    final Map<String, Object> cytoscapeElements =
+        plugin.loadCytoscapeElements(initialPath, contents, fileMap);
+    // do a sanity check for a valid cytoscape JSON
+    // http://manual.cytoscape.org/en/stable/Supported_Network_File_Formats.html#cytoscape-js-json
+    Assert.assertTrue(
+        cytoscapeElements.containsKey("nodes") && cytoscapeElements.containsKey("edges"));
+
+    final List<CompleteLanguageInterface.RowData> rowData =
+        plugin.generateToolsTable(initialPath, contents, fileMap);
+    Assert.assertFalse(rowData.isEmpty());
   }
 
   @Test
