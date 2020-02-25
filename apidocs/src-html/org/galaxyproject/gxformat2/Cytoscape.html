@@ -10,7 +10,7 @@
 <pre><span class="sourceLineNo">001</span><a id="line.1">package org.galaxyproject.gxformat2;</a>
 <span class="sourceLineNo">002</span><a id="line.2"></a>
 <span class="sourceLineNo">003</span><a id="line.3">import java.util.ArrayList;</a>
-<span class="sourceLineNo">004</span><a id="line.4">import java.util.Arrays;</a>
+<span class="sourceLineNo">004</span><a id="line.4">import java.util.Collections;</a>
 <span class="sourceLineNo">005</span><a id="line.5">import java.util.HashMap;</a>
 <span class="sourceLineNo">006</span><a id="line.6">import java.util.List;</a>
 <span class="sourceLineNo">007</span><a id="line.7">import java.util.Map;</a>
@@ -18,12 +18,12 @@
 <span class="sourceLineNo">009</span><a id="line.9">public class Cytoscape {</a>
 <span class="sourceLineNo">010</span><a id="line.10">  public static final String MAIN_TS_PREFIX = "toolshed.g2.bx.psu.edu/repos/";</a>
 <span class="sourceLineNo">011</span><a id="line.11"></a>
-<span class="sourceLineNo">012</span><a id="line.12">  public static List&lt;Map&lt;String, Object&gt;&gt; getElements(final String path) throws Exception {</a>
+<span class="sourceLineNo">012</span><a id="line.12">  public static Map&lt;String, Object&gt; getElements(final String path) throws Exception {</a>
 <span class="sourceLineNo">013</span><a id="line.13">    final Map&lt;String, Object&gt; object = (Map&lt;String, Object&gt;) IoUtils.readYamlFromPath(path);</a>
 <span class="sourceLineNo">014</span><a id="line.14">    return getElements(object);</a>
 <span class="sourceLineNo">015</span><a id="line.15">  }</a>
 <span class="sourceLineNo">016</span><a id="line.16"></a>
-<span class="sourceLineNo">017</span><a id="line.17">  public static List&lt;Map&lt;String, Object&gt;&gt; getElements(final Map&lt;String, Object&gt; object) {</a>
+<span class="sourceLineNo">017</span><a id="line.17">  public static Map&lt;String, Object&gt; getElements(final Map&lt;String, Object&gt; object) {</a>
 <span class="sourceLineNo">018</span><a id="line.18">    final String wfClass = (String) object.get("class");</a>
 <span class="sourceLineNo">019</span><a id="line.19">    WorkflowAdapter adapter;</a>
 <span class="sourceLineNo">020</span><a id="line.20">    if (wfClass == null) {</a>
@@ -32,101 +32,113 @@
 <span class="sourceLineNo">023</span><a id="line.23">      adapter = new Format2WorkflowAdapter(object);</a>
 <span class="sourceLineNo">024</span><a id="line.24">    }</a>
 <span class="sourceLineNo">025</span><a id="line.25">    int orderIndex = 0;</a>
-<span class="sourceLineNo">026</span><a id="line.26">    final List&lt;Map&lt;String, Object&gt;&gt; elements = new ArrayList&lt;&gt;();</a>
-<span class="sourceLineNo">027</span><a id="line.27">    for (final WorkflowAdapter.NormalizedStep normalizedStep : adapter.normalizedSteps()) {</a>
-<span class="sourceLineNo">028</span><a id="line.28">      final Map&lt;String, Object&gt; step = normalizedStep.stepDefinition;</a>
-<span class="sourceLineNo">029</span><a id="line.29">      String stepId =</a>
-<span class="sourceLineNo">030</span><a id="line.30">          step.get("label") != null ? (String) step.get("label") : Integer.toString(orderIndex);</a>
-<span class="sourceLineNo">031</span><a id="line.31">      String stepType = step.get("type") != null ? (String) step.get("type") : "tool";</a>
-<span class="sourceLineNo">032</span><a id="line.32">      List&lt;String&gt; classes = new ArrayList&lt;&gt;(Arrays.asList("type_" + stepType));</a>
-<span class="sourceLineNo">033</span><a id="line.33">      if (stepType.equals("tool") || stepType.equals("subworkflow")) {</a>
-<span class="sourceLineNo">034</span><a id="line.34">        classes.add("runnable");</a>
-<span class="sourceLineNo">035</span><a id="line.35">      } else {</a>
-<span class="sourceLineNo">036</span><a id="line.36">        classes.add("input");</a>
-<span class="sourceLineNo">037</span><a id="line.37">      }</a>
-<span class="sourceLineNo">038</span><a id="line.38">      String toolId = (String) step.get("tool_id");</a>
-<span class="sourceLineNo">039</span><a id="line.39">      if (toolId != null &amp;&amp; toolId.startsWith(MAIN_TS_PREFIX)) {</a>
-<span class="sourceLineNo">040</span><a id="line.40">        toolId = toolId.substring(MAIN_TS_PREFIX.length());</a>
-<span class="sourceLineNo">041</span><a id="line.41">      }</a>
-<span class="sourceLineNo">042</span><a id="line.42">      String label = normalizedStep.label;</a>
-<span class="sourceLineNo">043</span><a id="line.43">      if ((label == null || isOrderIndexLabel(label)) &amp;&amp; toolId != null) {</a>
-<span class="sourceLineNo">044</span><a id="line.44">        label = "tool:" + toolId;</a>
-<span class="sourceLineNo">045</span><a id="line.45">      }</a>
-<span class="sourceLineNo">046</span><a id="line.46">      final String repoLink;</a>
-<span class="sourceLineNo">047</span><a id="line.47">      if (step.containsKey("tool_shed_repository")) {</a>
-<span class="sourceLineNo">048</span><a id="line.48">        final Map&lt;String, String&gt; repo = (Map&lt;String, String&gt;) step.get("tool_shed_repository");</a>
-<span class="sourceLineNo">049</span><a id="line.49">        repoLink =</a>
-<span class="sourceLineNo">050</span><a id="line.50">            "https://"</a>
-<span class="sourceLineNo">051</span><a id="line.51">                + repo.get("tool_shed")</a>
-<span class="sourceLineNo">052</span><a id="line.52">                + "/view/"</a>
-<span class="sourceLineNo">053</span><a id="line.53">                + repo.get("owner")</a>
-<span class="sourceLineNo">054</span><a id="line.54">                + "/"</a>
-<span class="sourceLineNo">055</span><a id="line.55">                + repo.get("name")</a>
-<span class="sourceLineNo">056</span><a id="line.56">                + "/"</a>
-<span class="sourceLineNo">057</span><a id="line.57">                + repo.get("changeset_revision");</a>
-<span class="sourceLineNo">058</span><a id="line.58">      } else {</a>
-<span class="sourceLineNo">059</span><a id="line.59">        repoLink = null;</a>
-<span class="sourceLineNo">060</span><a id="line.60">      }</a>
-<span class="sourceLineNo">061</span><a id="line.61">      final Map&lt;String, Object&gt; nodeData = new HashMap&lt;String, Object&gt;();</a>
-<span class="sourceLineNo">062</span><a id="line.62">      nodeData.put("id", stepId);</a>
-<span class="sourceLineNo">063</span><a id="line.63">      nodeData.put("label", label);</a>
-<span class="sourceLineNo">064</span><a id="line.64">      nodeData.put("tool_id", step.get("tool_id"));</a>
-<span class="sourceLineNo">065</span><a id="line.65">      nodeData.put("doc", normalizedStep.doc);</a>
-<span class="sourceLineNo">066</span><a id="line.66">      nodeData.put("repo_link", repoLink);</a>
-<span class="sourceLineNo">067</span><a id="line.67">      nodeData.put("step_type", stepType);</a>
-<span class="sourceLineNo">068</span><a id="line.68">      final Map&lt;String, Object&gt; nodeElement = new HashMap&lt;String, Object&gt;();</a>
-<span class="sourceLineNo">069</span><a id="line.69">      nodeElement.put("group", "nodes");</a>
-<span class="sourceLineNo">070</span><a id="line.70">      nodeElement.put("data", nodeData);</a>
-<span class="sourceLineNo">071</span><a id="line.71">      nodeElement.put("classes", classes);</a>
-<span class="sourceLineNo">072</span><a id="line.72">      nodeElement.put("position", elementPosition(step));</a>
-<span class="sourceLineNo">073</span><a id="line.73">      elements.add(nodeElement);</a>
+<span class="sourceLineNo">026</span><a id="line.26">    final Map&lt;String, Object&gt; elements = new HashMap&lt;&gt;();</a>
+<span class="sourceLineNo">027</span><a id="line.27">    final List&lt;Object&gt; nodeElements = new ArrayList&lt;&gt;();</a>
+<span class="sourceLineNo">028</span><a id="line.28">    final List&lt;Object&gt; edgeElements = new ArrayList&lt;&gt;();</a>
+<span class="sourceLineNo">029</span><a id="line.29">    elements.put("nodes", nodeElements);</a>
+<span class="sourceLineNo">030</span><a id="line.30">    elements.put("edges", edgeElements);</a>
+<span class="sourceLineNo">031</span><a id="line.31"></a>
+<span class="sourceLineNo">032</span><a id="line.32">    for (final WorkflowAdapter.NormalizedStep normalizedStep : adapter.normalizedSteps()) {</a>
+<span class="sourceLineNo">033</span><a id="line.33">      final Map&lt;String, Object&gt; step = normalizedStep.stepDefinition;</a>
+<span class="sourceLineNo">034</span><a id="line.34">      String stepId =</a>
+<span class="sourceLineNo">035</span><a id="line.35">          step.get("label") != null ? (String) step.get("label") : Integer.toString(orderIndex);</a>
+<span class="sourceLineNo">036</span><a id="line.36">      String stepType = step.get("type") != null ? (String) step.get("type") : "tool";</a>
+<span class="sourceLineNo">037</span><a id="line.37">      List&lt;String&gt; classes = new ArrayList&lt;&gt;(Collections.singletonList("type_" + stepType));</a>
+<span class="sourceLineNo">038</span><a id="line.38">      if (stepType.equals("tool") || stepType.equals("subworkflow")) {</a>
+<span class="sourceLineNo">039</span><a id="line.39">        classes.add("runnable");</a>
+<span class="sourceLineNo">040</span><a id="line.40">      } else {</a>
+<span class="sourceLineNo">041</span><a id="line.41">        classes.add("input");</a>
+<span class="sourceLineNo">042</span><a id="line.42">      }</a>
+<span class="sourceLineNo">043</span><a id="line.43">      String toolId = (String) step.get("tool_id");</a>
+<span class="sourceLineNo">044</span><a id="line.44">      if (toolId != null &amp;&amp; toolId.startsWith(MAIN_TS_PREFIX)) {</a>
+<span class="sourceLineNo">045</span><a id="line.45">        toolId = toolId.substring(MAIN_TS_PREFIX.length());</a>
+<span class="sourceLineNo">046</span><a id="line.46">      }</a>
+<span class="sourceLineNo">047</span><a id="line.47">      String label = normalizedStep.label;</a>
+<span class="sourceLineNo">048</span><a id="line.48">      if ((label == null || isOrderIndexLabel(label)) &amp;&amp; toolId != null) {</a>
+<span class="sourceLineNo">049</span><a id="line.49">        label = "tool:" + toolId;</a>
+<span class="sourceLineNo">050</span><a id="line.50">      }</a>
+<span class="sourceLineNo">051</span><a id="line.51">      final String repoLink;</a>
+<span class="sourceLineNo">052</span><a id="line.52">      if (step.containsKey("tool_shed_repository")) {</a>
+<span class="sourceLineNo">053</span><a id="line.53">        final Map&lt;String, String&gt; repo = (Map&lt;String, String&gt;) step.get("tool_shed_repository");</a>
+<span class="sourceLineNo">054</span><a id="line.54">        repoLink =</a>
+<span class="sourceLineNo">055</span><a id="line.55">            "https://"</a>
+<span class="sourceLineNo">056</span><a id="line.56">                + repo.get("tool_shed")</a>
+<span class="sourceLineNo">057</span><a id="line.57">                + "/view/"</a>
+<span class="sourceLineNo">058</span><a id="line.58">                + repo.get("owner")</a>
+<span class="sourceLineNo">059</span><a id="line.59">                + "/"</a>
+<span class="sourceLineNo">060</span><a id="line.60">                + repo.get("name")</a>
+<span class="sourceLineNo">061</span><a id="line.61">                + "/"</a>
+<span class="sourceLineNo">062</span><a id="line.62">                + repo.get("changeset_revision");</a>
+<span class="sourceLineNo">063</span><a id="line.63">      } else {</a>
+<span class="sourceLineNo">064</span><a id="line.64">        repoLink = null;</a>
+<span class="sourceLineNo">065</span><a id="line.65">      }</a>
+<span class="sourceLineNo">066</span><a id="line.66">      final Map&lt;String, Object&gt; nodeData = new HashMap&lt;String, Object&gt;();</a>
+<span class="sourceLineNo">067</span><a id="line.67">      nodeData.put("id", stepId);</a>
+<span class="sourceLineNo">068</span><a id="line.68">      nodeData.put("label", label);</a>
+<span class="sourceLineNo">069</span><a id="line.69">      // dockstore displays name, docker, type, tool, and run</a>
+<span class="sourceLineNo">070</span><a id="line.70">      nodeData.put("name", label);</a>
+<span class="sourceLineNo">071</span><a id="line.71">      // TODO: detect Docker image properly</a>
+<span class="sourceLineNo">072</span><a id="line.72">      nodeData.put("docker", "TBD");</a>
+<span class="sourceLineNo">073</span><a id="line.73">      nodeData.put("run", "TBD");</a>
 <span class="sourceLineNo">074</span><a id="line.74"></a>
-<span class="sourceLineNo">075</span><a id="line.75">      for (final WorkflowAdapter.Input input : normalizedStep.inputs) {</a>
-<span class="sourceLineNo">076</span><a id="line.76">        final String edgeId = stepId + "__to__" + input.sourceStepLabel;</a>
-<span class="sourceLineNo">077</span><a id="line.77">        final Map&lt;String, Object&gt; edgeData = new HashMap&lt;&gt;();</a>
-<span class="sourceLineNo">078</span><a id="line.78">        edgeData.put("id", edgeId);</a>
-<span class="sourceLineNo">079</span><a id="line.79">        edgeData.put("source", input.sourceStepLabel);</a>
-<span class="sourceLineNo">080</span><a id="line.80">        edgeData.put("target", stepId);</a>
-<span class="sourceLineNo">081</span><a id="line.81">        edgeData.put("input", input.inputName);</a>
-<span class="sourceLineNo">082</span><a id="line.82">        edgeData.put("output", input.sourceOutputName);</a>
-<span class="sourceLineNo">083</span><a id="line.83">        final Map&lt;String, Object&gt; edgeElement = new HashMap&lt;&gt;();</a>
-<span class="sourceLineNo">084</span><a id="line.84">        edgeElement.put("group", "edges");</a>
-<span class="sourceLineNo">085</span><a id="line.85">        edgeElement.put("data", edgeData);</a>
-<span class="sourceLineNo">086</span><a id="line.86">        elements.add(edgeElement);</a>
-<span class="sourceLineNo">087</span><a id="line.87">      }</a>
-<span class="sourceLineNo">088</span><a id="line.88">      orderIndex++;</a>
-<span class="sourceLineNo">089</span><a id="line.89">    }</a>
-<span class="sourceLineNo">090</span><a id="line.90">    return elements;</a>
-<span class="sourceLineNo">091</span><a id="line.91">  }</a>
-<span class="sourceLineNo">092</span><a id="line.92"></a>
-<span class="sourceLineNo">093</span><a id="line.93">  static boolean isOrderIndexLabel(final String label) {</a>
-<span class="sourceLineNo">094</span><a id="line.94">    try {</a>
-<span class="sourceLineNo">095</span><a id="line.95">      Integer.parseInt(label);</a>
-<span class="sourceLineNo">096</span><a id="line.96">      return true;</a>
-<span class="sourceLineNo">097</span><a id="line.97">    } catch (NumberFormatException e) {</a>
-<span class="sourceLineNo">098</span><a id="line.98">      return false;</a>
-<span class="sourceLineNo">099</span><a id="line.99">    }</a>
-<span class="sourceLineNo">100</span><a id="line.100">  }</a>
+<span class="sourceLineNo">075</span><a id="line.75">      nodeData.put("tool_id", step.get("tool_id"));</a>
+<span class="sourceLineNo">076</span><a id="line.76">      nodeData.put("doc", normalizedStep.doc);</a>
+<span class="sourceLineNo">077</span><a id="line.77">      nodeData.put("repo_link", repoLink);</a>
+<span class="sourceLineNo">078</span><a id="line.78">      nodeData.put("step_type", stepType);</a>
+<span class="sourceLineNo">079</span><a id="line.79">      final Map&lt;String, Object&gt; nodeElement = new HashMap&lt;String, Object&gt;();</a>
+<span class="sourceLineNo">080</span><a id="line.80">      nodeElement.put("group", "nodes");</a>
+<span class="sourceLineNo">081</span><a id="line.81">      nodeElement.put("data", nodeData);</a>
+<span class="sourceLineNo">082</span><a id="line.82">      nodeElement.put("classes", classes);</a>
+<span class="sourceLineNo">083</span><a id="line.83">      nodeElement.put("position", elementPosition(step));</a>
+<span class="sourceLineNo">084</span><a id="line.84">      nodeElements.add(nodeElement);</a>
+<span class="sourceLineNo">085</span><a id="line.85"></a>
+<span class="sourceLineNo">086</span><a id="line.86">      for (final WorkflowAdapter.Input input : normalizedStep.inputs) {</a>
+<span class="sourceLineNo">087</span><a id="line.87">        final String edgeId = stepId + "__to__" + input.sourceStepLabel;</a>
+<span class="sourceLineNo">088</span><a id="line.88">        final Map&lt;String, Object&gt; edgeData = new HashMap&lt;&gt;();</a>
+<span class="sourceLineNo">089</span><a id="line.89">        edgeData.put("id", edgeId);</a>
+<span class="sourceLineNo">090</span><a id="line.90">        edgeData.put("source", input.sourceStepLabel);</a>
+<span class="sourceLineNo">091</span><a id="line.91">        edgeData.put("target", stepId);</a>
+<span class="sourceLineNo">092</span><a id="line.92">        edgeData.put("input", input.inputName);</a>
+<span class="sourceLineNo">093</span><a id="line.93">        edgeData.put("output", input.sourceOutputName);</a>
+<span class="sourceLineNo">094</span><a id="line.94">        final Map&lt;String, Object&gt; edgeElement = new HashMap&lt;&gt;();</a>
+<span class="sourceLineNo">095</span><a id="line.95">        edgeElement.put("group", "edges");</a>
+<span class="sourceLineNo">096</span><a id="line.96">        edgeElement.put("data", edgeData);</a>
+<span class="sourceLineNo">097</span><a id="line.97">        edgeElements.add(edgeElement);</a>
+<span class="sourceLineNo">098</span><a id="line.98">      }</a>
+<span class="sourceLineNo">099</span><a id="line.99">      orderIndex++;</a>
+<span class="sourceLineNo">100</span><a id="line.100">    }</a>
 <span class="sourceLineNo">101</span><a id="line.101"></a>
-<span class="sourceLineNo">102</span><a id="line.102">  private static Map&lt;String, Long&gt; elementPosition(final Map&lt;String, Object&gt; step) {</a>
-<span class="sourceLineNo">103</span><a id="line.103">    Map&lt;String, Object&gt; stepPosition = (Map&lt;String, Object&gt;) step.get("position");</a>
-<span class="sourceLineNo">104</span><a id="line.104">    Map&lt;String, Long&gt; elementPosition = new HashMap();</a>
-<span class="sourceLineNo">105</span><a id="line.105">    elementPosition.put("x", getIntegerValue(stepPosition, "left"));</a>
-<span class="sourceLineNo">106</span><a id="line.106">    elementPosition.put("y", getIntegerValue(stepPosition, "top"));</a>
-<span class="sourceLineNo">107</span><a id="line.107">    return elementPosition;</a>
-<span class="sourceLineNo">108</span><a id="line.108">  }</a>
-<span class="sourceLineNo">109</span><a id="line.109"></a>
-<span class="sourceLineNo">110</span><a id="line.110">  private static Long getIntegerValue(final Map&lt;String, Object&gt; fromMap, final String key) {</a>
-<span class="sourceLineNo">111</span><a id="line.111">    final Object value = fromMap.get(key);</a>
-<span class="sourceLineNo">112</span><a id="line.112">    if (value instanceof Float || value instanceof Double) {</a>
-<span class="sourceLineNo">113</span><a id="line.113">      return (long) Math.floor((double) value);</a>
-<span class="sourceLineNo">114</span><a id="line.114">    } else if (value instanceof Integer) {</a>
-<span class="sourceLineNo">115</span><a id="line.115">      return ((Integer) value).longValue();</a>
-<span class="sourceLineNo">116</span><a id="line.116">    } else {</a>
-<span class="sourceLineNo">117</span><a id="line.117">      return (long) value;</a>
-<span class="sourceLineNo">118</span><a id="line.118">    }</a>
-<span class="sourceLineNo">119</span><a id="line.119">  }</a>
-<span class="sourceLineNo">120</span><a id="line.120">}</a>
+<span class="sourceLineNo">102</span><a id="line.102">    return elements;</a>
+<span class="sourceLineNo">103</span><a id="line.103">  }</a>
+<span class="sourceLineNo">104</span><a id="line.104"></a>
+<span class="sourceLineNo">105</span><a id="line.105">  static boolean isOrderIndexLabel(final String label) {</a>
+<span class="sourceLineNo">106</span><a id="line.106">    try {</a>
+<span class="sourceLineNo">107</span><a id="line.107">      Integer.parseInt(label);</a>
+<span class="sourceLineNo">108</span><a id="line.108">      return true;</a>
+<span class="sourceLineNo">109</span><a id="line.109">    } catch (NumberFormatException e) {</a>
+<span class="sourceLineNo">110</span><a id="line.110">      return false;</a>
+<span class="sourceLineNo">111</span><a id="line.111">    }</a>
+<span class="sourceLineNo">112</span><a id="line.112">  }</a>
+<span class="sourceLineNo">113</span><a id="line.113"></a>
+<span class="sourceLineNo">114</span><a id="line.114">  private static Map&lt;String, Long&gt; elementPosition(final Map&lt;String, Object&gt; step) {</a>
+<span class="sourceLineNo">115</span><a id="line.115">    Map&lt;String, Object&gt; stepPosition = (Map&lt;String, Object&gt;) step.get("position");</a>
+<span class="sourceLineNo">116</span><a id="line.116">    Map&lt;String, Long&gt; elementPosition = new HashMap();</a>
+<span class="sourceLineNo">117</span><a id="line.117">    elementPosition.put("x", getIntegerValue(stepPosition, "left"));</a>
+<span class="sourceLineNo">118</span><a id="line.118">    elementPosition.put("y", getIntegerValue(stepPosition, "top"));</a>
+<span class="sourceLineNo">119</span><a id="line.119">    return elementPosition;</a>
+<span class="sourceLineNo">120</span><a id="line.120">  }</a>
+<span class="sourceLineNo">121</span><a id="line.121"></a>
+<span class="sourceLineNo">122</span><a id="line.122">  private static Long getIntegerValue(final Map&lt;String, Object&gt; fromMap, final String key) {</a>
+<span class="sourceLineNo">123</span><a id="line.123">    final Object value = fromMap.get(key);</a>
+<span class="sourceLineNo">124</span><a id="line.124">    if (value instanceof Float || value instanceof Double) {</a>
+<span class="sourceLineNo">125</span><a id="line.125">      return (long) Math.floor((double) value);</a>
+<span class="sourceLineNo">126</span><a id="line.126">    } else if (value instanceof Integer) {</a>
+<span class="sourceLineNo">127</span><a id="line.127">      return ((Integer) value).longValue();</a>
+<span class="sourceLineNo">128</span><a id="line.128">    } else {</a>
+<span class="sourceLineNo">129</span><a id="line.129">      return (long) value;</a>
+<span class="sourceLineNo">130</span><a id="line.130">    }</a>
+<span class="sourceLineNo">131</span><a id="line.131">  }</a>
+<span class="sourceLineNo">132</span><a id="line.132">}</a>
 
 
 
