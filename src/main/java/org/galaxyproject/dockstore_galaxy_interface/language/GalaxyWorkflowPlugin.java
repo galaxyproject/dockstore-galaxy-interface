@@ -1,10 +1,7 @@
 package org.galaxyproject.dockstore_galaxy_interface.language;
 
-import com.google.common.collect.Sets;
-import io.dockstore.common.DescriptorLanguage;
-import io.dockstore.common.VersionTypeValidation;
-import io.dockstore.language.CompleteLanguageInterface;
-import io.dockstore.language.RecommendedLanguageInterface;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -13,6 +10,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.VersionTypeValidation;
+import io.dockstore.language.CompleteLanguageInterface;
+import io.dockstore.language.RecommendedLanguageInterface;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -52,7 +57,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
     }
 
     @Override
-    public List<Map<String, Object>> loadCytoscapeElements(
+    public Map<String, Object> loadCytoscapeElements(
         String initialPath,
         String contents,
         Map<String, Pair<String, GenericFileType>> indexedFiles) {
@@ -61,11 +66,26 @@ public class GalaxyWorkflowPlugin extends Plugin {
     }
 
     @Override
-    public List<RowData> generateToolsTable(
-        String initialPath,
-        String contents,
-        Map<String, Pair<String, GenericFileType>> indexedFiles) {
-      throw new UnsupportedOperationException();
+    public List<RowData> generateToolsTable(String initialPath, String contents, Map<String, Pair<String, GenericFileType>> indexedFiles) {
+      final Map<String, Object> workflow = loadWorkflow(contents);
+      final Map<String, Object> elements = Cytoscape.getElements(workflow);
+      final List<Map> nodes = (List<Map>)elements.getOrDefault("nodes", Lists.newArrayList());
+      return nodes.stream().map(node -> {
+        final RowData rowData = new RowData();
+        final Map<String, Object> nodeData = (Map<String, Object>)node.get("data");
+        rowData.label = (String)nodeData.getOrDefault("label", "");
+        rowData.dockerContainer = (String)nodeData.getOrDefault("docker", "");
+        rowData.filename = (String)nodeData.getOrDefault("run", "");
+        // TODO: get a sane link here when Docker is hooked up
+        try {
+          rowData.link = new URL((String)node.getOrDefault("repo_link", ""));
+        } catch (MalformedURLException e) {
+          rowData.link = null;
+        }
+        rowData.rowType = RowType.TOOL;
+        rowData.toolid = (String)nodeData.getOrDefault("id", "");
+        return rowData;
+      }).collect(Collectors.toList());
     }
 
     @Override
@@ -90,8 +110,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
       if (validationMessageMerged.length() > 0) {
         messagesAsMap.put(initialPath, validationMessageMerged);
       }
-      final VersionTypeValidation validation = new VersionTypeValidation(valid, messagesAsMap);
-      return validation;
+      return new VersionTypeValidation(valid, messagesAsMap);
     }
 
     @Override
@@ -116,11 +135,8 @@ public class GalaxyWorkflowPlugin extends Plugin {
         final String initialPath, final String contents, final FileReader reader) {
       Map<String, Pair<String, GenericFileType>> results = new HashMap<>();
       final Optional<String> testParameterFile = findTestParameterFile(initialPath, reader);
-      if (testParameterFile.isPresent()) {
-        results.put(
-            testParameterFile.get(),
-            new ImmutablePair<>(testParameterFile.get(), GenericFileType.TEST_PARAMETER_FILE));
-      }
+      testParameterFile.ifPresent(
+          s -> results.put(s, new ImmutablePair<>(s, GenericFileType.TEST_PARAMETER_FILE)));
       return results;
     }
 
