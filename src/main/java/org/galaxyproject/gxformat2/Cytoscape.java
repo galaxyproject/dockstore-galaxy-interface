@@ -5,9 +5,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Cytoscape {
   public static final String MAIN_TS_PREFIX = "toolshed.g2.bx.psu.edu/repos/";
+  private static final String START_ID = "UniqueBeginKey";
+  private static final String END_ID = "UniqueEndKey";
 
   public static Map<String, Object> getElements(final String path) throws Exception {
     final Map<String, Object> object = (Map<String, Object>) IoUtils.readYamlFromPath(path);
@@ -22,17 +26,21 @@ public class Cytoscape {
     } else {
       adapter = new Format2WorkflowAdapter(object);
     }
-    int orderIndex = 0;
     final Map<String, Object> elements = new HashMap<>();
     final List<Object> nodeElements = new ArrayList<>();
     final List<Object> edgeElements = new ArrayList<>();
     elements.put("nodes", nodeElements);
     elements.put("edges", edgeElements);
-
+    nodeElements.add(createStartNode());
+    nodeElements.add(createEndNode());
+    List<WorkflowAdapter.NormalizedStep> normalizedSteps = adapter.normalizedSteps();
+    Set<String> endNodeIds =
+        normalizedSteps.stream()
+            .map(normalizedStep -> ((Integer) normalizedStep.stepDefinition.get("id")).toString())
+            .collect(Collectors.toSet());
     for (final WorkflowAdapter.NormalizedStep normalizedStep : adapter.normalizedSteps()) {
       final Map<String, Object> step = normalizedStep.stepDefinition;
-      String stepId =
-          step.get("label") != null ? (String) step.get("label") : Integer.toString(orderIndex);
+      String stepId = ((Integer) step.get("id")).toString();
       String stepType = step.get("type") != null ? (String) step.get("type") : "tool";
       List<String> classes = new ArrayList<>(Collections.singletonList("type_" + stepType));
       if (stepType.equals("tool") || stepType.equals("subworkflow")) {
@@ -83,11 +91,17 @@ public class Cytoscape {
       nodeElement.put("position", elementPosition(step));
       nodeElements.add(nodeElement);
 
+      Object inputConnections = normalizedStep.stepDefinition.get("input_connections");
+      if (normalizedStep.inputs.isEmpty() && inputConnections.toString().equals("{}")) {
+        edgeElements.add(createEdge(START_ID, stepId));
+      }
       for (final WorkflowAdapter.Input input : normalizedStep.inputs) {
         final String edgeId = stepId + "__to__" + input.sourceStepLabel;
         final Map<String, Object> edgeData = new HashMap<>();
         edgeData.put("id", edgeId);
         edgeData.put("source", input.sourceStepLabel);
+        // Any node that's a source of an edge is not an end node
+        endNodeIds.remove(input.sourceStepLabel);
         edgeData.put("target", stepId);
         edgeData.put("input", input.inputName);
         edgeData.put("output", input.sourceOutputName);
@@ -96,9 +110,9 @@ public class Cytoscape {
         edgeElement.put("data", edgeData);
         edgeElements.add(edgeElement);
       }
-      orderIndex++;
     }
-
+    // Create edges for end nodes to direct to the real end node
+    endNodeIds.forEach(endNodeId -> edgeElements.add(createEdge(endNodeId, END_ID)));
     return elements;
   }
 
@@ -109,6 +123,17 @@ public class Cytoscape {
     } catch (NumberFormatException e) {
       return false;
     }
+  }
+
+  private static CytoscapeDAG.Edge createEdge(String source, String target) {
+    String id = source + "__to__" + target;
+    CytoscapeDAG.Edge edge = new CytoscapeDAG.Edge();
+    CytoscapeDAG.Edge.EdgeData edgeData = new CytoscapeDAG.Edge.EdgeData();
+    edgeData.setId(id);
+    edgeData.setSource(source);
+    edgeData.setTarget(target);
+    edge.setData(edgeData);
+    return edge;
   }
 
   private static Map<String, Long> elementPosition(final Map<String, Object> step) {
@@ -128,5 +153,22 @@ public class Cytoscape {
     } else {
       return (long) value;
     }
+  }
+
+  private static Object createStartNode() {
+    return createStartOrEndNode(START_ID);
+  }
+
+  private static Object createEndNode() {
+    return createStartOrEndNode(END_ID);
+  }
+
+  private static CytoscapeDAG.Node createStartOrEndNode(String id) {
+    CytoscapeDAG.Node.NodeData nodeData = new CytoscapeDAG.Node.NodeData();
+    CytoscapeDAG.Node node = new CytoscapeDAG.Node();
+    nodeData.setId(id);
+    nodeData.setName(id);
+    node.setData(nodeData);
+    return node;
   }
 }
