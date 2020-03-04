@@ -83,7 +83,7 @@ public class Cytoscape {
       nodeData.put("tool_id", step.get("tool_id"));
       nodeData.put("doc", normalizedStep.doc);
       nodeData.put("repo_link", repoLink);
-      nodeData.put("step_type", stepType);
+      nodeData.put("type", stepType);
       final Map<String, Object> nodeElement = new HashMap<String, Object>();
       nodeElement.put("group", "nodes");
       nodeElement.put("data", nodeData);
