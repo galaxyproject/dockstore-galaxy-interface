@@ -32,6 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import static org.galaxyproject.gxformat2.Cytoscape.END_ID;
+import static org.galaxyproject.gxformat2.Cytoscape.START_ID;
+
 /** @author jmchilton */
 public class GalaxyWorkflowPlugin extends Plugin {
   public static final Logger LOG = LoggerFactory.getLogger(GalaxyWorkflowPlugin.class);
@@ -74,7 +77,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
               node -> {
                 Map data = (Map) node.get("data");
                 String id = (String) data.get("id");
-                return "UniqueBeginKey".equals(id) || "UniqueEndKey".equals(id);
+                return START_ID.equals(id) || END_ID.equals(id);
               });
       return nodes.stream().map(node -> {
         final RowData rowData = new RowData();

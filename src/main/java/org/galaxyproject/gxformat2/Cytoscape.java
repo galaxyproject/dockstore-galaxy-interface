@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Cytoscape {
   public static final ObjectMapper objectMapper = new ObjectMapper();
   public static final String MAIN_TS_PREFIX = "toolshed.g2.bx.psu.edu/repos/";
-  private static final String START_ID = "UniqueBeginKey";
-  private static final String END_ID = "UniqueEndKey";
+  public static final String START_ID = "UniqueBeginKey";
+  public static final String END_ID = "UniqueEndKey";
 
   public static Map<String, Object> getElements(final String path) throws Exception {
     final Map<String, Object> object = (Map<String, Object>) IoUtils.readYamlFromPath(path);
