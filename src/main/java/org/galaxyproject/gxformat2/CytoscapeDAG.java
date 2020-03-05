@@ -1,8 +1,7 @@
 package org.galaxyproject.gxformat2;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
  * @author gluu

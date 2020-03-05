@@ -5,10 +5,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Cytoscape {
+  public static final ObjectMapper objectMapper = new ObjectMapper();
   public static final String MAIN_TS_PREFIX = "toolshed.g2.bx.psu.edu/repos/";
   private static final String START_ID = "UniqueBeginKey";
   private static final String END_ID = "UniqueEndKey";
@@ -16,6 +20,32 @@ public class Cytoscape {
   public static Map<String, Object> getElements(final String path) throws Exception {
     final Map<String, Object> object = (Map<String, Object>) IoUtils.readYamlFromPath(path);
     return getElements(object);
+  }
+
+  private static class IdAndLabel {
+    private String id;
+    private String label;
+
+    IdAndLabel(String id, String label) {
+      this.setId(id);
+      this.setLabel(label);
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    public void setLabel(String label) {
+      this.label = label;
+    }
   }
 
   public static Map<String, Object> getElements(final Map<String, Object> object) {
@@ -37,6 +67,19 @@ public class Cytoscape {
     Set<String> endNodeIds =
         normalizedSteps.stream()
             .map(normalizedStep -> ((Integer) normalizedStep.stepDefinition.get("id")).toString())
+            .collect(Collectors.toSet());
+    Set<IdAndLabel> allNodesIdsAndLabels =
+        normalizedSteps.stream()
+            .map(
+                normalizedStep -> {
+                  Map<String, Object> stepDefinition = normalizedStep.stepDefinition;
+                  String id = ((Integer) stepDefinition.get("id")).toString();
+                  String label =
+                      stepDefinition.get("label") != null
+                          ? stepDefinition.get("label").toString()
+                          : null;
+                  return new IdAndLabel(id, label);
+                })
             .collect(Collectors.toSet());
     for (final WorkflowAdapter.NormalizedStep normalizedStep : adapter.normalizedSteps()) {
       final Map<String, Object> step = normalizedStep.stepDefinition;
@@ -71,7 +114,7 @@ public class Cytoscape {
       } else {
         repoLink = null;
       }
-      final Map<String, Object> nodeData = new HashMap<String, Object>();
+      final Map<String, Object> nodeData = new HashMap<>();
       nodeData.put("id", stepId);
       nodeData.put("label", label);
       // dockstore displays name, docker, type, tool, and run
@@ -84,7 +127,7 @@ public class Cytoscape {
       nodeData.put("doc", normalizedStep.doc);
       nodeData.put("repo_link", repoLink);
       nodeData.put("type", stepType);
-      final Map<String, Object> nodeElement = new HashMap<String, Object>();
+      final Map<String, Object> nodeElement = new HashMap<>();
       nodeElement.put("group", "nodes");
       nodeElement.put("data", nodeData);
       nodeElement.put("classes", classes);
@@ -96,19 +139,33 @@ public class Cytoscape {
         edgeElements.add(createEdge(START_ID, stepId));
       }
       for (final WorkflowAdapter.Input input : normalizedStep.inputs) {
-        final String edgeId = stepId + "__to__" + input.sourceStepLabel;
+        String sourceStepLabel = input.sourceStepLabel;
+        final String edgeId = stepId + "__to__" + sourceStepLabel;
         final Map<String, Object> edgeData = new HashMap<>();
         edgeData.put("id", edgeId);
-        edgeData.put("source", input.sourceStepLabel);
-        // Any node that's a source of an edge is not an end node
-        endNodeIds.remove(input.sourceStepLabel);
-        edgeData.put("target", stepId);
-        edgeData.put("input", input.inputName);
-        edgeData.put("output", input.sourceOutputName);
-        final Map<String, Object> edgeElement = new HashMap<>();
-        edgeElement.put("group", "edges");
-        edgeElement.put("data", edgeData);
-        edgeElements.add(edgeElement);
+        Optional<IdAndLabel> sourceId =
+            allNodesIdsAndLabels.stream()
+                .filter(
+                    thing -> {
+                      boolean equals = sourceStepLabel.equals(thing.getLabel());
+                      boolean equals2 = sourceStepLabel.equals(thing.getId());
+                      return equals || equals2;
+                    })
+                .findFirst();
+        if (sourceId.isPresent()) {
+          edgeData.put("source", sourceId.get().id);
+          // Any node that's a source of an edge is not an end node
+          endNodeIds.remove(sourceId.get().id);
+          edgeData.put("target", stepId);
+          edgeData.put("input", input.inputName);
+          edgeData.put("output", input.sourceOutputName);
+          final Map<String, Object> edgeElement = new HashMap<>();
+          edgeElement.put("group", "edges");
+          edgeElement.put("data", edgeData);
+          edgeElements.add(edgeElement);
+        } else {
+          System.out.println("Something is wrong");
+        }
       }
     }
     // Create edges for end nodes to direct to the real end node
@@ -155,20 +212,20 @@ public class Cytoscape {
     }
   }
 
-  private static Object createStartNode() {
+  private static Map<String, Object> createStartNode() {
     return createStartOrEndNode(START_ID);
   }
 
-  private static Object createEndNode() {
+  private static Map<String, Object> createEndNode() {
     return createStartOrEndNode(END_ID);
   }
 
-  private static CytoscapeDAG.Node createStartOrEndNode(String id) {
+  private static Map<String, Object> createStartOrEndNode(String id) {
     CytoscapeDAG.Node.NodeData nodeData = new CytoscapeDAG.Node.NodeData();
-    CytoscapeDAG.Node node = new CytoscapeDAG.Node();
     nodeData.setId(id);
     nodeData.setName(id);
+    CytoscapeDAG.Node node = new CytoscapeDAG.Node();
     node.setData(nodeData);
-    return node;
+    return objectMapper.convertValue(node, Map.class);
   }
 }
