@@ -70,6 +70,12 @@ public class GalaxyWorkflowPlugin extends Plugin {
       final Map<String, Object> workflow = loadWorkflow(contents);
       final Map<String, Object> elements = Cytoscape.getElements(workflow);
       final List<Map> nodes = (List<Map>)elements.getOrDefault("nodes", Lists.newArrayList());
+      nodes.removeIf(
+              node -> {
+                Map data = (Map) node.get("data");
+                String id = (String) data.get("id");
+                return "UniqueBeginKey".equals(id) || "UniqueEndKey".equals(id);
+              });
       return nodes.stream().map(node -> {
         final RowData rowData = new RowData();
         final Map<String, Object> nodeData = (Map<String, Object>)node.get("data");
