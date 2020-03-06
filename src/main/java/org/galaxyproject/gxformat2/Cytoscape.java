@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkflowPlugin.LOG;
+
 public class Cytoscape {
   public static final ObjectMapper objectMapper = new ObjectMapper();
   public static final String MAIN_TS_PREFIX = "toolshed.g2.bx.psu.edu/repos/";
@@ -126,6 +128,7 @@ public class Cytoscape {
       nodeData.put("tool_id", step.get("tool_id"));
       nodeData.put("doc", normalizedStep.doc);
       nodeData.put("repo_link", repoLink);
+      nodeData.put("step_type", stepType);
       nodeData.put("type", stepType);
       final Map<String, Object> nodeElement = new HashMap<>();
       nodeElement.put("group", "nodes");
@@ -134,6 +137,7 @@ public class Cytoscape {
       nodeElement.put("position", elementPosition(step));
       nodeElements.add(nodeElement);
 
+      // Create edge from start node if there's no input connections
       Object inputConnections = normalizedStep.stepDefinition.get("input_connections");
       if (normalizedStep.inputs.isEmpty() && inputConnections.toString().equals("{}")) {
         edgeElements.add(createEdge(START_ID, stepId));
@@ -143,13 +147,14 @@ public class Cytoscape {
         final String edgeId = stepId + "__to__" + sourceStepLabel;
         final Map<String, Object> edgeData = new HashMap<>();
         edgeData.put("id", edgeId);
+        // Look up what the step ID is based on sourceStepLabel which is either the step ID itself or the step label
         Optional<IdAndLabel> sourceId =
             allNodesIdsAndLabels.stream()
                 .filter(
-                    thing -> {
-                      boolean equals = sourceStepLabel.equals(thing.getLabel());
-                      boolean equals2 = sourceStepLabel.equals(thing.getId());
-                      return equals || equals2;
+                    partialStep -> {
+                      boolean isLabel = sourceStepLabel.equals(partialStep.getLabel());
+                      boolean isId = sourceStepLabel.equals(partialStep.getId());
+                      return isLabel || isId;
                     })
                 .findFirst();
         if (sourceId.isPresent()) {
@@ -164,7 +169,8 @@ public class Cytoscape {
           edgeElement.put("data", edgeData);
           edgeElements.add(edgeElement);
         } else {
-          System.out.println("Something is wrong");
+          String errorMessage = String.format("Could not find input \"%s\" from the workflow steps.", input.sourceStepLabel);
+          LOG.error(errorMessage);
         }
       }
     }
