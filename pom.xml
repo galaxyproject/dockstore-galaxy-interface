@@ -15,6 +15,7 @@
         <plugin.id>${project.artifactId}</plugin.id>
         <plugin.class>org.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkflowPlugin</plugin.class>
         <plugin.version>${project.version}</plugin.version>
+        <jackson.version>2.10.1</jackson.version>
         <plugin.provider>jmchilton</plugin.provider>
         <plugin.dependencies />
     </properties>
@@ -219,6 +220,18 @@
             <artifactId>gson</artifactId>
             <version>2.8.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
