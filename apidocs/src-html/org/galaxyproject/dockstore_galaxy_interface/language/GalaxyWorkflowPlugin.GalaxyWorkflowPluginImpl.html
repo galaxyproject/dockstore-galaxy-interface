@@ -41,231 +41,244 @@
 <span class="sourceLineNo">032</span><a id="line.32">import org.yaml.snakeyaml.Yaml;</a>
 <span class="sourceLineNo">033</span><a id="line.33">import org.yaml.snakeyaml.error.YAMLException;</a>
 <span class="sourceLineNo">034</span><a id="line.34"></a>
-<span class="sourceLineNo">035</span><a id="line.35">/** @author jmchilton */</a>
-<span class="sourceLineNo">036</span><a id="line.36">public class GalaxyWorkflowPlugin extends Plugin {</a>
-<span class="sourceLineNo">037</span><a id="line.37">  public static final Logger LOG = LoggerFactory.getLogger(GalaxyWorkflowPlugin.class);</a>
-<span class="sourceLineNo">038</span><a id="line.38">  public static final String[] TEST_SUFFIXES = {"-tests", "_tests", "-test", "-tests"};</a>
-<span class="sourceLineNo">039</span><a id="line.39">  public static final String[] TEST_EXTENSIONS = {".yml", ".yaml", ".json"};</a>
-<span class="sourceLineNo">040</span><a id="line.40"></a>
-<span class="sourceLineNo">041</span><a id="line.41">  /**</a>
-<span class="sourceLineNo">042</span><a id="line.42">   * Constructor to be used by plugin manager for plugin instantiation. Your plugins have to provide</a>
-<span class="sourceLineNo">043</span><a id="line.43">   * constructor with this exact signature to be successfully loaded by manager.</a>
-<span class="sourceLineNo">044</span><a id="line.44">   *</a>
-<span class="sourceLineNo">045</span><a id="line.45">   * @param wrapper</a>
-<span class="sourceLineNo">046</span><a id="line.46">   */</a>
-<span class="sourceLineNo">047</span><a id="line.47">  public GalaxyWorkflowPlugin(PluginWrapper wrapper) {</a>
-<span class="sourceLineNo">048</span><a id="line.48">    super(wrapper);</a>
-<span class="sourceLineNo">049</span><a id="line.49">  }</a>
-<span class="sourceLineNo">050</span><a id="line.50"></a>
-<span class="sourceLineNo">051</span><a id="line.51">  @Extension</a>
-<span class="sourceLineNo">052</span><a id="line.52">  public static class GalaxyWorkflowPluginImpl implements CompleteLanguageInterface {</a>
+<span class="sourceLineNo">035</span><a id="line.35">import static org.galaxyproject.gxformat2.Cytoscape.END_ID;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import static org.galaxyproject.gxformat2.Cytoscape.START_ID;</a>
+<span class="sourceLineNo">037</span><a id="line.37"></a>
+<span class="sourceLineNo">038</span><a id="line.38">/** @author jmchilton */</a>
+<span class="sourceLineNo">039</span><a id="line.39">public class GalaxyWorkflowPlugin extends Plugin {</a>
+<span class="sourceLineNo">040</span><a id="line.40">  public static final Logger LOG = LoggerFactory.getLogger(GalaxyWorkflowPlugin.class);</a>
+<span class="sourceLineNo">041</span><a id="line.41">  public static final String[] TEST_SUFFIXES = {"-tests", "_tests", "-test", "-tests"};</a>
+<span class="sourceLineNo">042</span><a id="line.42">  public static final String[] TEST_EXTENSIONS = {".yml", ".yaml", ".json"};</a>
+<span class="sourceLineNo">043</span><a id="line.43"></a>
+<span class="sourceLineNo">044</span><a id="line.44">  /**</a>
+<span class="sourceLineNo">045</span><a id="line.45">   * Constructor to be used by plugin manager for plugin instantiation. Your plugins have to provide</a>
+<span class="sourceLineNo">046</span><a id="line.46">   * constructor with this exact signature to be successfully loaded by manager.</a>
+<span class="sourceLineNo">047</span><a id="line.47">   *</a>
+<span class="sourceLineNo">048</span><a id="line.48">   * @param wrapper</a>
+<span class="sourceLineNo">049</span><a id="line.49">   */</a>
+<span class="sourceLineNo">050</span><a id="line.50">  public GalaxyWorkflowPlugin(PluginWrapper wrapper) {</a>
+<span class="sourceLineNo">051</span><a id="line.51">    super(wrapper);</a>
+<span class="sourceLineNo">052</span><a id="line.52">  }</a>
 <span class="sourceLineNo">053</span><a id="line.53"></a>
-<span class="sourceLineNo">054</span><a id="line.54">    @Override</a>
-<span class="sourceLineNo">055</span><a id="line.55">    public String launchInstructions(String trsID) {</a>
-<span class="sourceLineNo">056</span><a id="line.56">      return null;</a>
-<span class="sourceLineNo">057</span><a id="line.57">    }</a>
-<span class="sourceLineNo">058</span><a id="line.58"></a>
-<span class="sourceLineNo">059</span><a id="line.59">    @Override</a>
-<span class="sourceLineNo">060</span><a id="line.60">    public Map&lt;String, Object&gt; loadCytoscapeElements(</a>
-<span class="sourceLineNo">061</span><a id="line.61">        String initialPath,</a>
-<span class="sourceLineNo">062</span><a id="line.62">        String contents,</a>
-<span class="sourceLineNo">063</span><a id="line.63">        Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
-<span class="sourceLineNo">064</span><a id="line.64">      final Map&lt;String, Object&gt; workflow = loadWorkflow(contents);</a>
-<span class="sourceLineNo">065</span><a id="line.65">      return Cytoscape.getElements(workflow);</a>
-<span class="sourceLineNo">066</span><a id="line.66">    }</a>
-<span class="sourceLineNo">067</span><a id="line.67"></a>
-<span class="sourceLineNo">068</span><a id="line.68">    @Override</a>
-<span class="sourceLineNo">069</span><a id="line.69">    public List&lt;RowData&gt; generateToolsTable(String initialPath, String contents, Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
-<span class="sourceLineNo">070</span><a id="line.70">      final Map&lt;String, Object&gt; workflow = loadWorkflow(contents);</a>
-<span class="sourceLineNo">071</span><a id="line.71">      final Map&lt;String, Object&gt; elements = Cytoscape.getElements(workflow);</a>
-<span class="sourceLineNo">072</span><a id="line.72">      final List&lt;Map&gt; nodes = (List&lt;Map&gt;)elements.getOrDefault("nodes", Lists.newArrayList());</a>
-<span class="sourceLineNo">073</span><a id="line.73">      return nodes.stream().map(node -&gt; {</a>
-<span class="sourceLineNo">074</span><a id="line.74">        final RowData rowData = new RowData();</a>
-<span class="sourceLineNo">075</span><a id="line.75">        final Map&lt;String, Object&gt; nodeData = (Map&lt;String, Object&gt;)node.get("data");</a>
-<span class="sourceLineNo">076</span><a id="line.76">        rowData.label = (String)nodeData.getOrDefault("label", "");</a>
-<span class="sourceLineNo">077</span><a id="line.77">        rowData.dockerContainer = (String)nodeData.getOrDefault("docker", "");</a>
-<span class="sourceLineNo">078</span><a id="line.78">        rowData.filename = (String)nodeData.getOrDefault("run", "");</a>
-<span class="sourceLineNo">079</span><a id="line.79">        // TODO: get a sane link here when Docker is hooked up</a>
-<span class="sourceLineNo">080</span><a id="line.80">        try {</a>
-<span class="sourceLineNo">081</span><a id="line.81">          rowData.link = new URL((String)node.getOrDefault("repo_link", ""));</a>
-<span class="sourceLineNo">082</span><a id="line.82">        } catch (MalformedURLException e) {</a>
-<span class="sourceLineNo">083</span><a id="line.83">          rowData.link = null;</a>
-<span class="sourceLineNo">084</span><a id="line.84">        }</a>
-<span class="sourceLineNo">085</span><a id="line.85">        rowData.rowType = RowType.TOOL;</a>
-<span class="sourceLineNo">086</span><a id="line.86">        rowData.toolid = (String)nodeData.getOrDefault("id", "");</a>
-<span class="sourceLineNo">087</span><a id="line.87">        return rowData;</a>
-<span class="sourceLineNo">088</span><a id="line.88">      }).collect(Collectors.toList());</a>
-<span class="sourceLineNo">089</span><a id="line.89">    }</a>
-<span class="sourceLineNo">090</span><a id="line.90"></a>
-<span class="sourceLineNo">091</span><a id="line.91">    @Override</a>
-<span class="sourceLineNo">092</span><a id="line.92">    public VersionTypeValidation validateWorkflowSet(</a>
-<span class="sourceLineNo">093</span><a id="line.93">        String initialPath,</a>
-<span class="sourceLineNo">094</span><a id="line.94">        String contents,</a>
-<span class="sourceLineNo">095</span><a id="line.95">        Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
-<span class="sourceLineNo">096</span><a id="line.96">      final LintContext lintContext = Lint.lint(loadWorkflow(contents));</a>
-<span class="sourceLineNo">097</span><a id="line.97">      final boolean valid;</a>
-<span class="sourceLineNo">098</span><a id="line.98">      valid = !lintContext.getFoundErrors();</a>
-<span class="sourceLineNo">099</span><a id="line.99">      final Map&lt;String, String&gt; messagesAsMap = new HashMap&lt;&gt;();</a>
-<span class="sourceLineNo">100</span><a id="line.100">      final List&lt;String&gt; validationMessages = lintContext.collectMessages();</a>
-<span class="sourceLineNo">101</span><a id="line.101">      final StringBuilder builder = new StringBuilder();</a>
-<span class="sourceLineNo">102</span><a id="line.102">      if (validationMessages.size() == 1) {</a>
-<span class="sourceLineNo">103</span><a id="line.103">        builder.append(validationMessages.get(0));</a>
-<span class="sourceLineNo">104</span><a id="line.104">      } else if (validationMessages.size() &gt; 1) {</a>
-<span class="sourceLineNo">105</span><a id="line.105">        for (final String validationMessage : validationMessages) {</a>
-<span class="sourceLineNo">106</span><a id="line.106">          builder.append("- ").append(validationMessage).append("\n");</a>
-<span class="sourceLineNo">107</span><a id="line.107">        }</a>
-<span class="sourceLineNo">108</span><a id="line.108">      }</a>
-<span class="sourceLineNo">109</span><a id="line.109">      final String validationMessageMerged = builder.toString();</a>
-<span class="sourceLineNo">110</span><a id="line.110">      if (validationMessageMerged.length() &gt; 0) {</a>
-<span class="sourceLineNo">111</span><a id="line.111">        messagesAsMap.put(initialPath, validationMessageMerged);</a>
-<span class="sourceLineNo">112</span><a id="line.112">      }</a>
-<span class="sourceLineNo">113</span><a id="line.113">      return new VersionTypeValidation(valid, messagesAsMap);</a>
-<span class="sourceLineNo">114</span><a id="line.114">    }</a>
-<span class="sourceLineNo">115</span><a id="line.115"></a>
-<span class="sourceLineNo">116</span><a id="line.116">    @Override</a>
-<span class="sourceLineNo">117</span><a id="line.117">    public VersionTypeValidation validateTestParameterSet(</a>
-<span class="sourceLineNo">118</span><a id="line.118">        Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
-<span class="sourceLineNo">119</span><a id="line.119">      return new VersionTypeValidation(true, new HashMap&lt;&gt;());</a>
-<span class="sourceLineNo">120</span><a id="line.120">    }</a>
-<span class="sourceLineNo">121</span><a id="line.121"></a>
-<span class="sourceLineNo">122</span><a id="line.122">    @Override</a>
-<span class="sourceLineNo">123</span><a id="line.123">    public DescriptorLanguage getDescriptorLanguage() {</a>
-<span class="sourceLineNo">124</span><a id="line.124">      return DescriptorLanguage.GXFORMAT2;</a>
-<span class="sourceLineNo">125</span><a id="line.125">    }</a>
-<span class="sourceLineNo">126</span><a id="line.126"></a>
-<span class="sourceLineNo">127</span><a id="line.127">    @Override</a>
-<span class="sourceLineNo">128</span><a id="line.128">    public Pattern initialPathPattern() {</a>
-<span class="sourceLineNo">129</span><a id="line.129">      // Why doesn't this seem to be called anywhere?</a>
-<span class="sourceLineNo">130</span><a id="line.130">      return Pattern.compile("/(.*\\.gxwf\\.y[a]?ml|.*\\.ga)");</a>
-<span class="sourceLineNo">131</span><a id="line.131">    }</a>
-<span class="sourceLineNo">132</span><a id="line.132"></a>
-<span class="sourceLineNo">133</span><a id="line.133">    @Override</a>
-<span class="sourceLineNo">134</span><a id="line.134">    public Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexWorkflowFiles(</a>
-<span class="sourceLineNo">135</span><a id="line.135">        final String initialPath, final String contents, final FileReader reader) {</a>
-<span class="sourceLineNo">136</span><a id="line.136">      Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; results = new HashMap&lt;&gt;();</a>
-<span class="sourceLineNo">137</span><a id="line.137">      final Optional&lt;String&gt; testParameterFile = findTestParameterFile(initialPath, reader);</a>
-<span class="sourceLineNo">138</span><a id="line.138">      testParameterFile.ifPresent(</a>
-<span class="sourceLineNo">139</span><a id="line.139">          s -&gt; results.put(s, new ImmutablePair&lt;&gt;(s, GenericFileType.TEST_PARAMETER_FILE)));</a>
-<span class="sourceLineNo">140</span><a id="line.140">      return results;</a>
-<span class="sourceLineNo">141</span><a id="line.141">    }</a>
-<span class="sourceLineNo">142</span><a id="line.142"></a>
-<span class="sourceLineNo">143</span><a id="line.143">    protected Optional&lt;String&gt; findTestParameterFile(</a>
-<span class="sourceLineNo">144</span><a id="line.144">        final String initialPath, final FileReader reader) {</a>
-<span class="sourceLineNo">145</span><a id="line.145">      final int extensionPos = initialPath.lastIndexOf(".");</a>
-<span class="sourceLineNo">146</span><a id="line.146">      final String base = initialPath.substring(0, extensionPos);</a>
-<span class="sourceLineNo">147</span><a id="line.147"></a>
-<span class="sourceLineNo">148</span><a id="line.148">      final Path parent = Paths.get(initialPath).getParent();</a>
-<span class="sourceLineNo">149</span><a id="line.149">      // listing files is more rate limit friendly (e.g. GitHub counts each 404 "miss" as an API</a>
-<span class="sourceLineNo">150</span><a id="line.150">      // call,</a>
-<span class="sourceLineNo">151</span><a id="line.151">      // but listing a directory can be free if previously requested/cached)</a>
-<span class="sourceLineNo">152</span><a id="line.152">      final Set&lt;String&gt; filenameset =</a>
-<span class="sourceLineNo">153</span><a id="line.153">          parent == null ? Sets.newHashSet() : Sets.newHashSet(reader.listFiles(parent.toString()));</a>
-<span class="sourceLineNo">154</span><a id="line.154"></a>
-<span class="sourceLineNo">155</span><a id="line.155">      for (final String suffix : TEST_SUFFIXES) {</a>
-<span class="sourceLineNo">156</span><a id="line.156">        for (final String extension : TEST_EXTENSIONS) {</a>
-<span class="sourceLineNo">157</span><a id="line.157">          final String testFile = base + suffix + extension;</a>
-<span class="sourceLineNo">158</span><a id="line.158">          if (filenameset.contains(testFile)) {</a>
-<span class="sourceLineNo">159</span><a id="line.159">            return Optional.of(testFile);</a>
-<span class="sourceLineNo">160</span><a id="line.160">          }</a>
-<span class="sourceLineNo">161</span><a id="line.161">        }</a>
-<span class="sourceLineNo">162</span><a id="line.162">      }</a>
-<span class="sourceLineNo">163</span><a id="line.163">      return Optional.empty();</a>
-<span class="sourceLineNo">164</span><a id="line.164">    }</a>
-<span class="sourceLineNo">165</span><a id="line.165"></a>
-<span class="sourceLineNo">166</span><a id="line.166">    protected Boolean pathExistsFromReader(final FileReader reader, final String path) {</a>
-<span class="sourceLineNo">167</span><a id="line.167">      try {</a>
-<span class="sourceLineNo">168</span><a id="line.168">        reader.readFile(path);</a>
-<span class="sourceLineNo">169</span><a id="line.169">        return true;</a>
-<span class="sourceLineNo">170</span><a id="line.170">      } catch (Exception e) {</a>
-<span class="sourceLineNo">171</span><a id="line.171">        return false;</a>
-<span class="sourceLineNo">172</span><a id="line.172">      }</a>
-<span class="sourceLineNo">173</span><a id="line.173">    }</a>
-<span class="sourceLineNo">174</span><a id="line.174"></a>
-<span class="sourceLineNo">175</span><a id="line.175">    static Map&lt;String, Object&gt; loadWorkflow(final String content) {</a>
-<span class="sourceLineNo">176</span><a id="line.176">      final Yaml yaml = new Yaml();</a>
-<span class="sourceLineNo">177</span><a id="line.177">      final Map map = yaml.loadAs(content, Map.class);</a>
-<span class="sourceLineNo">178</span><a id="line.178">      return (Map&lt;String, Object&gt;) map;</a>
-<span class="sourceLineNo">179</span><a id="line.179">    }</a>
-<span class="sourceLineNo">180</span><a id="line.180"></a>
-<span class="sourceLineNo">181</span><a id="line.181">    @Override</a>
-<span class="sourceLineNo">182</span><a id="line.182">    public RecommendedLanguageInterface.WorkflowMetadata parseWorkflowForMetadata(</a>
-<span class="sourceLineNo">183</span><a id="line.183">        String initialPath,</a>
-<span class="sourceLineNo">184</span><a id="line.184">        String content,</a>
-<span class="sourceLineNo">185</span><a id="line.185">        Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
-<span class="sourceLineNo">186</span><a id="line.186">      RecommendedLanguageInterface.WorkflowMetadata metadata =</a>
-<span class="sourceLineNo">187</span><a id="line.187">          new RecommendedLanguageInterface.WorkflowMetadata();</a>
-<span class="sourceLineNo">188</span><a id="line.188">      if (content != null &amp;&amp; !content.isEmpty()) {</a>
-<span class="sourceLineNo">189</span><a id="line.189">        try {</a>
-<span class="sourceLineNo">190</span><a id="line.190">          final Map&lt;String, Object&gt; map = loadWorkflow(content);</a>
-<span class="sourceLineNo">191</span><a id="line.191">          String name = null;</a>
-<span class="sourceLineNo">192</span><a id="line.192">          try {</a>
-<span class="sourceLineNo">193</span><a id="line.193">            name = (String) map.get("name");</a>
-<span class="sourceLineNo">194</span><a id="line.194">          } catch (ClassCastException e) {</a>
-<span class="sourceLineNo">195</span><a id="line.195">            LOG.debug("\"name:\" is malformed");</a>
-<span class="sourceLineNo">196</span><a id="line.196">          }</a>
-<span class="sourceLineNo">197</span><a id="line.197"></a>
-<span class="sourceLineNo">198</span><a id="line.198">          // FOLLOWING CODE PULLED FROM cwl handler...</a>
-<span class="sourceLineNo">199</span><a id="line.199">          String label = null;</a>
-<span class="sourceLineNo">200</span><a id="line.200">          try {</a>
-<span class="sourceLineNo">201</span><a id="line.201">            label = (String) map.get("label");</a>
-<span class="sourceLineNo">202</span><a id="line.202">          } catch (ClassCastException e) {</a>
-<span class="sourceLineNo">203</span><a id="line.203">            LOG.debug("\"label:\" is malformed");</a>
-<span class="sourceLineNo">204</span><a id="line.204">          }</a>
-<span class="sourceLineNo">205</span><a id="line.205"></a>
-<span class="sourceLineNo">206</span><a id="line.206">          // "doc:" added for CWL 1.0</a>
-<span class="sourceLineNo">207</span><a id="line.207">          String doc = null;</a>
-<span class="sourceLineNo">208</span><a id="line.208">          if (map.containsKey("doc")) {</a>
-<span class="sourceLineNo">209</span><a id="line.209">            Object objectDoc = map.get("doc");</a>
-<span class="sourceLineNo">210</span><a id="line.210">            if (objectDoc instanceof String) {</a>
-<span class="sourceLineNo">211</span><a id="line.211">              doc = (String) objectDoc;</a>
-<span class="sourceLineNo">212</span><a id="line.212">            } else if (objectDoc instanceof Map) {</a>
-<span class="sourceLineNo">213</span><a id="line.213">              Map docMap = (Map) objectDoc;</a>
-<span class="sourceLineNo">214</span><a id="line.214">              if (docMap.containsKey("$include")) {</a>
-<span class="sourceLineNo">215</span><a id="line.215">                String enclosingFile = (String) docMap.get("$include");</a>
-<span class="sourceLineNo">216</span><a id="line.216">                Optional&lt;Pair&lt;String, GenericFileType&gt;&gt; first =</a>
-<span class="sourceLineNo">217</span><a id="line.217">                    indexedFiles.values().stream()</a>
-<span class="sourceLineNo">218</span><a id="line.218">                        .filter(pair -&gt; pair.getLeft().equals(enclosingFile))</a>
-<span class="sourceLineNo">219</span><a id="line.219">                        .findFirst();</a>
-<span class="sourceLineNo">220</span><a id="line.220">                if (first.isPresent()) {</a>
-<span class="sourceLineNo">221</span><a id="line.221">                  // No way to fetch this here...</a>
-<span class="sourceLineNo">222</span><a id="line.222">                  LOG.info(</a>
-<span class="sourceLineNo">223</span><a id="line.223">                      "$include would have this but reader not passed through, not implemented");</a>
-<span class="sourceLineNo">224</span><a id="line.224">                  doc = null;</a>
-<span class="sourceLineNo">225</span><a id="line.225">                }</a>
-<span class="sourceLineNo">226</span><a id="line.226">              }</a>
-<span class="sourceLineNo">227</span><a id="line.227">            } else if (objectDoc instanceof List) {</a>
-<span class="sourceLineNo">228</span><a id="line.228">              // arrays for "doc:" added in CWL 1.1</a>
-<span class="sourceLineNo">229</span><a id="line.229">              List docList = (List) objectDoc;</a>
-<span class="sourceLineNo">230</span><a id="line.230">              doc = String.join(System.getProperty("line.separator"), docList);</a>
-<span class="sourceLineNo">231</span><a id="line.231">            }</a>
-<span class="sourceLineNo">232</span><a id="line.232">          }</a>
-<span class="sourceLineNo">233</span><a id="line.233"></a>
-<span class="sourceLineNo">234</span><a id="line.234">          final String finalChoiceForDescription = ObjectUtils.firstNonNull(name, label, doc);</a>
-<span class="sourceLineNo">235</span><a id="line.235">          if (finalChoiceForDescription != null) {</a>
-<span class="sourceLineNo">236</span><a id="line.236">            metadata.setDescription(finalChoiceForDescription);</a>
-<span class="sourceLineNo">237</span><a id="line.237">          } else {</a>
-<span class="sourceLineNo">238</span><a id="line.238">            LOG.info("Description not found!");</a>
-<span class="sourceLineNo">239</span><a id="line.239">          }</a>
-<span class="sourceLineNo">240</span><a id="line.240"></a>
-<span class="sourceLineNo">241</span><a id="line.241">        } catch (YAMLException | NullPointerException | ClassCastException ex) {</a>
-<span class="sourceLineNo">242</span><a id="line.242">          String message;</a>
-<span class="sourceLineNo">243</span><a id="line.243">          if (ex.getCause() != null) {</a>
-<span class="sourceLineNo">244</span><a id="line.244">            // seems to be possible to get underlying cause in some cases</a>
-<span class="sourceLineNo">245</span><a id="line.245">            message = ex.getCause().toString();</a>
-<span class="sourceLineNo">246</span><a id="line.246">          } else {</a>
-<span class="sourceLineNo">247</span><a id="line.247">            // in other cases, the above will NullPointer</a>
-<span class="sourceLineNo">248</span><a id="line.248">            message = ex.toString();</a>
-<span class="sourceLineNo">249</span><a id="line.249">          }</a>
-<span class="sourceLineNo">250</span><a id="line.250">          LOG.info("Galaxy Workflow file is malformed " + message);</a>
-<span class="sourceLineNo">251</span><a id="line.251">          // CWL parser gets to put validation information in here,</a>
-<span class="sourceLineNo">252</span><a id="line.252">          // plugin interface doesn't consume the right information though.</a>
-<span class="sourceLineNo">253</span><a id="line.253">          // https://github.com/dockstore/dockstore/blob/develop/dockstore-webservice/src/main/java/io/dockstore/webservice/languages/CWLHandler.java#L139</a>
-<span class="sourceLineNo">254</span><a id="line.254">        }</a>
-<span class="sourceLineNo">255</span><a id="line.255">      }</a>
-<span class="sourceLineNo">256</span><a id="line.256">      return metadata;</a>
-<span class="sourceLineNo">257</span><a id="line.257">    }</a>
-<span class="sourceLineNo">258</span><a id="line.258">  }</a>
-<span class="sourceLineNo">259</span><a id="line.259">}</a>
+<span class="sourceLineNo">054</span><a id="line.54">  @Extension</a>
+<span class="sourceLineNo">055</span><a id="line.55">  public static class GalaxyWorkflowPluginImpl implements CompleteLanguageInterface {</a>
+<span class="sourceLineNo">056</span><a id="line.56"></a>
+<span class="sourceLineNo">057</span><a id="line.57">    @Override</a>
+<span class="sourceLineNo">058</span><a id="line.58">    public String launchInstructions(String trsID) {</a>
+<span class="sourceLineNo">059</span><a id="line.59">      return null;</a>
+<span class="sourceLineNo">060</span><a id="line.60">    }</a>
+<span class="sourceLineNo">061</span><a id="line.61"></a>
+<span class="sourceLineNo">062</span><a id="line.62">    @Override</a>
+<span class="sourceLineNo">063</span><a id="line.63">    public Map&lt;String, Object&gt; loadCytoscapeElements(</a>
+<span class="sourceLineNo">064</span><a id="line.64">        String initialPath,</a>
+<span class="sourceLineNo">065</span><a id="line.65">        String contents,</a>
+<span class="sourceLineNo">066</span><a id="line.66">        Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
+<span class="sourceLineNo">067</span><a id="line.67">      final Map&lt;String, Object&gt; workflow = loadWorkflow(contents);</a>
+<span class="sourceLineNo">068</span><a id="line.68">      return Cytoscape.getElements(workflow);</a>
+<span class="sourceLineNo">069</span><a id="line.69">    }</a>
+<span class="sourceLineNo">070</span><a id="line.70"></a>
+<span class="sourceLineNo">071</span><a id="line.71">    @Override</a>
+<span class="sourceLineNo">072</span><a id="line.72">    public List&lt;RowData&gt; generateToolsTable(String initialPath, String contents, Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
+<span class="sourceLineNo">073</span><a id="line.73">      final Map&lt;String, Object&gt; workflow = loadWorkflow(contents);</a>
+<span class="sourceLineNo">074</span><a id="line.74">      final Map&lt;String, Object&gt; elements = Cytoscape.getElements(workflow);</a>
+<span class="sourceLineNo">075</span><a id="line.75">      final List&lt;Map&gt; nodes = (List&lt;Map&gt;)elements.getOrDefault("nodes", Lists.newArrayList());</a>
+<span class="sourceLineNo">076</span><a id="line.76">      removeStartAndEndNodes(nodes);</a>
+<span class="sourceLineNo">077</span><a id="line.77">      return nodes.stream().map(node -&gt; {</a>
+<span class="sourceLineNo">078</span><a id="line.78">        final RowData rowData = new RowData();</a>
+<span class="sourceLineNo">079</span><a id="line.79">        final Map&lt;String, Object&gt; nodeData = (Map&lt;String, Object&gt;)node.get("data");</a>
+<span class="sourceLineNo">080</span><a id="line.80">        rowData.label = (String)nodeData.getOrDefault("label", "");</a>
+<span class="sourceLineNo">081</span><a id="line.81">        rowData.dockerContainer = (String)nodeData.getOrDefault("docker", "");</a>
+<span class="sourceLineNo">082</span><a id="line.82">        rowData.filename = (String)nodeData.getOrDefault("run", "");</a>
+<span class="sourceLineNo">083</span><a id="line.83">        // TODO: get a sane link here when Docker is hooked up</a>
+<span class="sourceLineNo">084</span><a id="line.84">        try {</a>
+<span class="sourceLineNo">085</span><a id="line.85">          rowData.link = new URL((String)node.getOrDefault("repo_link", ""));</a>
+<span class="sourceLineNo">086</span><a id="line.86">        } catch (MalformedURLException e) {</a>
+<span class="sourceLineNo">087</span><a id="line.87">          rowData.link = null;</a>
+<span class="sourceLineNo">088</span><a id="line.88">        }</a>
+<span class="sourceLineNo">089</span><a id="line.89">        rowData.rowType = RowType.TOOL;</a>
+<span class="sourceLineNo">090</span><a id="line.90">        rowData.toolid = (String)nodeData.getOrDefault("id", "");</a>
+<span class="sourceLineNo">091</span><a id="line.91">        return rowData;</a>
+<span class="sourceLineNo">092</span><a id="line.92">      }).collect(Collectors.toList());</a>
+<span class="sourceLineNo">093</span><a id="line.93">    }</a>
+<span class="sourceLineNo">094</span><a id="line.94"></a>
+<span class="sourceLineNo">095</span><a id="line.95">    // Remove start and end nodes that were added for DAG</a>
+<span class="sourceLineNo">096</span><a id="line.96">    private void removeStartAndEndNodes(List&lt;Map&gt; nodes) {</a>
+<span class="sourceLineNo">097</span><a id="line.97">        nodes.removeIf(node -&gt; {</a>
+<span class="sourceLineNo">098</span><a id="line.98">          Map data = (Map)node.get("data");</a>
+<span class="sourceLineNo">099</span><a id="line.99">          String id = (String)data.get("id");</a>
+<span class="sourceLineNo">100</span><a id="line.100">          return START_ID.equals(id) || END_ID.equals(id);</a>
+<span class="sourceLineNo">101</span><a id="line.101">        });</a>
+<span class="sourceLineNo">102</span><a id="line.102">    }</a>
+<span class="sourceLineNo">103</span><a id="line.103"></a>
+<span class="sourceLineNo">104</span><a id="line.104">    @Override</a>
+<span class="sourceLineNo">105</span><a id="line.105">    public VersionTypeValidation validateWorkflowSet(</a>
+<span class="sourceLineNo">106</span><a id="line.106">        String initialPath,</a>
+<span class="sourceLineNo">107</span><a id="line.107">        String contents,</a>
+<span class="sourceLineNo">108</span><a id="line.108">        Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
+<span class="sourceLineNo">109</span><a id="line.109">      final LintContext lintContext = Lint.lint(loadWorkflow(contents));</a>
+<span class="sourceLineNo">110</span><a id="line.110">      final boolean valid;</a>
+<span class="sourceLineNo">111</span><a id="line.111">      valid = !lintContext.getFoundErrors();</a>
+<span class="sourceLineNo">112</span><a id="line.112">      final Map&lt;String, String&gt; messagesAsMap = new HashMap&lt;&gt;();</a>
+<span class="sourceLineNo">113</span><a id="line.113">      final List&lt;String&gt; validationMessages = lintContext.collectMessages();</a>
+<span class="sourceLineNo">114</span><a id="line.114">      final StringBuilder builder = new StringBuilder();</a>
+<span class="sourceLineNo">115</span><a id="line.115">      if (validationMessages.size() == 1) {</a>
+<span class="sourceLineNo">116</span><a id="line.116">        builder.append(validationMessages.get(0));</a>
+<span class="sourceLineNo">117</span><a id="line.117">      } else if (validationMessages.size() &gt; 1) {</a>
+<span class="sourceLineNo">118</span><a id="line.118">        for (final String validationMessage : validationMessages) {</a>
+<span class="sourceLineNo">119</span><a id="line.119">          builder.append("- ").append(validationMessage).append("\n");</a>
+<span class="sourceLineNo">120</span><a id="line.120">        }</a>
+<span class="sourceLineNo">121</span><a id="line.121">      }</a>
+<span class="sourceLineNo">122</span><a id="line.122">      final String validationMessageMerged = builder.toString();</a>
+<span class="sourceLineNo">123</span><a id="line.123">      if (validationMessageMerged.length() &gt; 0) {</a>
+<span class="sourceLineNo">124</span><a id="line.124">        messagesAsMap.put(initialPath, validationMessageMerged);</a>
+<span class="sourceLineNo">125</span><a id="line.125">      }</a>
+<span class="sourceLineNo">126</span><a id="line.126">      return new VersionTypeValidation(valid, messagesAsMap);</a>
+<span class="sourceLineNo">127</span><a id="line.127">    }</a>
+<span class="sourceLineNo">128</span><a id="line.128"></a>
+<span class="sourceLineNo">129</span><a id="line.129">    @Override</a>
+<span class="sourceLineNo">130</span><a id="line.130">    public VersionTypeValidation validateTestParameterSet(</a>
+<span class="sourceLineNo">131</span><a id="line.131">        Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
+<span class="sourceLineNo">132</span><a id="line.132">      return new VersionTypeValidation(true, new HashMap&lt;&gt;());</a>
+<span class="sourceLineNo">133</span><a id="line.133">    }</a>
+<span class="sourceLineNo">134</span><a id="line.134"></a>
+<span class="sourceLineNo">135</span><a id="line.135">    @Override</a>
+<span class="sourceLineNo">136</span><a id="line.136">    public DescriptorLanguage getDescriptorLanguage() {</a>
+<span class="sourceLineNo">137</span><a id="line.137">      return DescriptorLanguage.GXFORMAT2;</a>
+<span class="sourceLineNo">138</span><a id="line.138">    }</a>
+<span class="sourceLineNo">139</span><a id="line.139"></a>
+<span class="sourceLineNo">140</span><a id="line.140">    @Override</a>
+<span class="sourceLineNo">141</span><a id="line.141">    public Pattern initialPathPattern() {</a>
+<span class="sourceLineNo">142</span><a id="line.142">      // Why doesn't this seem to be called anywhere?</a>
+<span class="sourceLineNo">143</span><a id="line.143">      return Pattern.compile("/(.*\\.gxwf\\.y[a]?ml|.*\\.ga)");</a>
+<span class="sourceLineNo">144</span><a id="line.144">    }</a>
+<span class="sourceLineNo">145</span><a id="line.145"></a>
+<span class="sourceLineNo">146</span><a id="line.146">    @Override</a>
+<span class="sourceLineNo">147</span><a id="line.147">    public Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexWorkflowFiles(</a>
+<span class="sourceLineNo">148</span><a id="line.148">        final String initialPath, final String contents, final FileReader reader) {</a>
+<span class="sourceLineNo">149</span><a id="line.149">      Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; results = new HashMap&lt;&gt;();</a>
+<span class="sourceLineNo">150</span><a id="line.150">      final Optional&lt;String&gt; testParameterFile = findTestParameterFile(initialPath, reader);</a>
+<span class="sourceLineNo">151</span><a id="line.151">      testParameterFile.ifPresent(</a>
+<span class="sourceLineNo">152</span><a id="line.152">          s -&gt; results.put(s, new ImmutablePair&lt;&gt;(s, GenericFileType.TEST_PARAMETER_FILE)));</a>
+<span class="sourceLineNo">153</span><a id="line.153">      return results;</a>
+<span class="sourceLineNo">154</span><a id="line.154">    }</a>
+<span class="sourceLineNo">155</span><a id="line.155"></a>
+<span class="sourceLineNo">156</span><a id="line.156">    protected Optional&lt;String&gt; findTestParameterFile(</a>
+<span class="sourceLineNo">157</span><a id="line.157">        final String initialPath, final FileReader reader) {</a>
+<span class="sourceLineNo">158</span><a id="line.158">      final int extensionPos = initialPath.lastIndexOf(".");</a>
+<span class="sourceLineNo">159</span><a id="line.159">      final String base = initialPath.substring(0, extensionPos);</a>
+<span class="sourceLineNo">160</span><a id="line.160"></a>
+<span class="sourceLineNo">161</span><a id="line.161">      final Path parent = Paths.get(initialPath).getParent();</a>
+<span class="sourceLineNo">162</span><a id="line.162">      // listing files is more rate limit friendly (e.g. GitHub counts each 404 "miss" as an API</a>
+<span class="sourceLineNo">163</span><a id="line.163">      // call,</a>
+<span class="sourceLineNo">164</span><a id="line.164">      // but listing a directory can be free if previously requested/cached)</a>
+<span class="sourceLineNo">165</span><a id="line.165">      final Set&lt;String&gt; filenameset =</a>
+<span class="sourceLineNo">166</span><a id="line.166">          parent == null ? Sets.newHashSet() : Sets.newHashSet(reader.listFiles(parent.toString()));</a>
+<span class="sourceLineNo">167</span><a id="line.167"></a>
+<span class="sourceLineNo">168</span><a id="line.168">      for (final String suffix : TEST_SUFFIXES) {</a>
+<span class="sourceLineNo">169</span><a id="line.169">        for (final String extension : TEST_EXTENSIONS) {</a>
+<span class="sourceLineNo">170</span><a id="line.170">          final String testFile = base + suffix + extension;</a>
+<span class="sourceLineNo">171</span><a id="line.171">          if (filenameset.contains(testFile)) {</a>
+<span class="sourceLineNo">172</span><a id="line.172">            return Optional.of(testFile);</a>
+<span class="sourceLineNo">173</span><a id="line.173">          }</a>
+<span class="sourceLineNo">174</span><a id="line.174">        }</a>
+<span class="sourceLineNo">175</span><a id="line.175">      }</a>
+<span class="sourceLineNo">176</span><a id="line.176">      return Optional.empty();</a>
+<span class="sourceLineNo">177</span><a id="line.177">    }</a>
+<span class="sourceLineNo">178</span><a id="line.178"></a>
+<span class="sourceLineNo">179</span><a id="line.179">    protected Boolean pathExistsFromReader(final FileReader reader, final String path) {</a>
+<span class="sourceLineNo">180</span><a id="line.180">      try {</a>
+<span class="sourceLineNo">181</span><a id="line.181">        reader.readFile(path);</a>
+<span class="sourceLineNo">182</span><a id="line.182">        return true;</a>
+<span class="sourceLineNo">183</span><a id="line.183">      } catch (Exception e) {</a>
+<span class="sourceLineNo">184</span><a id="line.184">        return false;</a>
+<span class="sourceLineNo">185</span><a id="line.185">      }</a>
+<span class="sourceLineNo">186</span><a id="line.186">    }</a>
+<span class="sourceLineNo">187</span><a id="line.187"></a>
+<span class="sourceLineNo">188</span><a id="line.188">    static Map&lt;String, Object&gt; loadWorkflow(final String content) {</a>
+<span class="sourceLineNo">189</span><a id="line.189">      final Yaml yaml = new Yaml();</a>
+<span class="sourceLineNo">190</span><a id="line.190">      final Map map = yaml.loadAs(content, Map.class);</a>
+<span class="sourceLineNo">191</span><a id="line.191">      return (Map&lt;String, Object&gt;) map;</a>
+<span class="sourceLineNo">192</span><a id="line.192">    }</a>
+<span class="sourceLineNo">193</span><a id="line.193"></a>
+<span class="sourceLineNo">194</span><a id="line.194">    @Override</a>
+<span class="sourceLineNo">195</span><a id="line.195">    public RecommendedLanguageInterface.WorkflowMetadata parseWorkflowForMetadata(</a>
+<span class="sourceLineNo">196</span><a id="line.196">        String initialPath,</a>
+<span class="sourceLineNo">197</span><a id="line.197">        String content,</a>
+<span class="sourceLineNo">198</span><a id="line.198">        Map&lt;String, Pair&lt;String, GenericFileType&gt;&gt; indexedFiles) {</a>
+<span class="sourceLineNo">199</span><a id="line.199">      RecommendedLanguageInterface.WorkflowMetadata metadata =</a>
+<span class="sourceLineNo">200</span><a id="line.200">          new RecommendedLanguageInterface.WorkflowMetadata();</a>
+<span class="sourceLineNo">201</span><a id="line.201">      if (content != null &amp;&amp; !content.isEmpty()) {</a>
+<span class="sourceLineNo">202</span><a id="line.202">        try {</a>
+<span class="sourceLineNo">203</span><a id="line.203">          final Map&lt;String, Object&gt; map = loadWorkflow(content);</a>
+<span class="sourceLineNo">204</span><a id="line.204">          String name = null;</a>
+<span class="sourceLineNo">205</span><a id="line.205">          try {</a>
+<span class="sourceLineNo">206</span><a id="line.206">            name = (String) map.get("name");</a>
+<span class="sourceLineNo">207</span><a id="line.207">          } catch (ClassCastException e) {</a>
+<span class="sourceLineNo">208</span><a id="line.208">            LOG.debug("\"name:\" is malformed");</a>
+<span class="sourceLineNo">209</span><a id="line.209">          }</a>
+<span class="sourceLineNo">210</span><a id="line.210"></a>
+<span class="sourceLineNo">211</span><a id="line.211">          // FOLLOWING CODE PULLED FROM cwl handler...</a>
+<span class="sourceLineNo">212</span><a id="line.212">          String label = null;</a>
+<span class="sourceLineNo">213</span><a id="line.213">          try {</a>
+<span class="sourceLineNo">214</span><a id="line.214">            label = (String) map.get("label");</a>
+<span class="sourceLineNo">215</span><a id="line.215">          } catch (ClassCastException e) {</a>
+<span class="sourceLineNo">216</span><a id="line.216">            LOG.debug("\"label:\" is malformed");</a>
+<span class="sourceLineNo">217</span><a id="line.217">          }</a>
+<span class="sourceLineNo">218</span><a id="line.218"></a>
+<span class="sourceLineNo">219</span><a id="line.219">          // "doc:" added for CWL 1.0</a>
+<span class="sourceLineNo">220</span><a id="line.220">          String doc = null;</a>
+<span class="sourceLineNo">221</span><a id="line.221">          if (map.containsKey("doc")) {</a>
+<span class="sourceLineNo">222</span><a id="line.222">            Object objectDoc = map.get("doc");</a>
+<span class="sourceLineNo">223</span><a id="line.223">            if (objectDoc instanceof String) {</a>
+<span class="sourceLineNo">224</span><a id="line.224">              doc = (String) objectDoc;</a>
+<span class="sourceLineNo">225</span><a id="line.225">            } else if (objectDoc instanceof Map) {</a>
+<span class="sourceLineNo">226</span><a id="line.226">              Map docMap = (Map) objectDoc;</a>
+<span class="sourceLineNo">227</span><a id="line.227">              if (docMap.containsKey("$include")) {</a>
+<span class="sourceLineNo">228</span><a id="line.228">                String enclosingFile = (String) docMap.get("$include");</a>
+<span class="sourceLineNo">229</span><a id="line.229">                Optional&lt;Pair&lt;String, GenericFileType&gt;&gt; first =</a>
+<span class="sourceLineNo">230</span><a id="line.230">                    indexedFiles.values().stream()</a>
+<span class="sourceLineNo">231</span><a id="line.231">                        .filter(pair -&gt; pair.getLeft().equals(enclosingFile))</a>
+<span class="sourceLineNo">232</span><a id="line.232">                        .findFirst();</a>
+<span class="sourceLineNo">233</span><a id="line.233">                if (first.isPresent()) {</a>
+<span class="sourceLineNo">234</span><a id="line.234">                  // No way to fetch this here...</a>
+<span class="sourceLineNo">235</span><a id="line.235">                  LOG.info(</a>
+<span class="sourceLineNo">236</span><a id="line.236">                      "$include would have this but reader not passed through, not implemented");</a>
+<span class="sourceLineNo">237</span><a id="line.237">                  doc = null;</a>
+<span class="sourceLineNo">238</span><a id="line.238">                }</a>
+<span class="sourceLineNo">239</span><a id="line.239">              }</a>
+<span class="sourceLineNo">240</span><a id="line.240">            } else if (objectDoc instanceof List) {</a>
+<span class="sourceLineNo">241</span><a id="line.241">              // arrays for "doc:" added in CWL 1.1</a>
+<span class="sourceLineNo">242</span><a id="line.242">              List docList = (List) objectDoc;</a>
+<span class="sourceLineNo">243</span><a id="line.243">              doc = String.join(System.getProperty("line.separator"), docList);</a>
+<span class="sourceLineNo">244</span><a id="line.244">            }</a>
+<span class="sourceLineNo">245</span><a id="line.245">          }</a>
+<span class="sourceLineNo">246</span><a id="line.246"></a>
+<span class="sourceLineNo">247</span><a id="line.247">          final String finalChoiceForDescription = ObjectUtils.firstNonNull(name, label, doc);</a>
+<span class="sourceLineNo">248</span><a id="line.248">          if (finalChoiceForDescription != null) {</a>
+<span class="sourceLineNo">249</span><a id="line.249">            metadata.setDescription(finalChoiceForDescription);</a>
+<span class="sourceLineNo">250</span><a id="line.250">          } else {</a>
+<span class="sourceLineNo">251</span><a id="line.251">            LOG.info("Description not found!");</a>
+<span class="sourceLineNo">252</span><a id="line.252">          }</a>
+<span class="sourceLineNo">253</span><a id="line.253"></a>
+<span class="sourceLineNo">254</span><a id="line.254">        } catch (YAMLException | NullPointerException | ClassCastException ex) {</a>
+<span class="sourceLineNo">255</span><a id="line.255">          String message;</a>
+<span class="sourceLineNo">256</span><a id="line.256">          if (ex.getCause() != null) {</a>
+<span class="sourceLineNo">257</span><a id="line.257">            // seems to be possible to get underlying cause in some cases</a>
+<span class="sourceLineNo">258</span><a id="line.258">            message = ex.getCause().toString();</a>
+<span class="sourceLineNo">259</span><a id="line.259">          } else {</a>
+<span class="sourceLineNo">260</span><a id="line.260">            // in other cases, the above will NullPointer</a>
+<span class="sourceLineNo">261</span><a id="line.261">            message = ex.toString();</a>
+<span class="sourceLineNo">262</span><a id="line.262">          }</a>
+<span class="sourceLineNo">263</span><a id="line.263">          LOG.info("Galaxy Workflow file is malformed " + message);</a>
+<span class="sourceLineNo">264</span><a id="line.264">          // CWL parser gets to put validation information in here,</a>
+<span class="sourceLineNo">265</span><a id="line.265">          // plugin interface doesn't consume the right information though.</a>
+<span class="sourceLineNo">266</span><a id="line.266">          // https://github.com/dockstore/dockstore/blob/develop/dockstore-webservice/src/main/java/io/dockstore/webservice/languages/CWLHandler.java#L139</a>
+<span class="sourceLineNo">267</span><a id="line.267">        }</a>
+<span class="sourceLineNo">268</span><a id="line.268">      }</a>
+<span class="sourceLineNo">269</span><a id="line.269">      return metadata;</a>
+<span class="sourceLineNo">270</span><a id="line.270">    }</a>
+<span class="sourceLineNo">271</span><a id="line.271">  }</a>
+<span class="sourceLineNo">272</span><a id="line.272">}</a>
 
 
 
