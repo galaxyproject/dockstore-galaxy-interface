@@ -32,6 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import static org.galaxyproject.gxformat2.Cytoscape.END_ID;
+import static org.galaxyproject.gxformat2.Cytoscape.START_ID;
+
 /** @author jmchilton */
 public class GalaxyWorkflowPlugin extends Plugin {
   public static final Logger LOG = LoggerFactory.getLogger(GalaxyWorkflowPlugin.class);
@@ -70,6 +73,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
       final Map<String, Object> workflow = loadWorkflow(contents);
       final Map<String, Object> elements = Cytoscape.getElements(workflow);
       final List<Map> nodes = (List<Map>)elements.getOrDefault("nodes", Lists.newArrayList());
+      removeStartAndEndNodes(nodes);
       return nodes.stream().map(node -> {
         final RowData rowData = new RowData();
         final Map<String, Object> nodeData = (Map<String, Object>)node.get("data");
@@ -86,6 +90,15 @@ public class GalaxyWorkflowPlugin extends Plugin {
         rowData.toolid = (String)nodeData.getOrDefault("id", "");
         return rowData;
       }).collect(Collectors.toList());
+    }
+
+    // Remove start and end nodes that were added for DAG
+    private void removeStartAndEndNodes(List<Map> nodes) {
+        nodes.removeIf(node -> {
+          Map data = (Map)node.get("data");
+          String id = (String)data.get("id");
+          return START_ID.equals(id) || END_ID.equals(id);
+        });
     }
 
     @Override
