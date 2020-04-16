@@ -70,7 +70,8 @@ public class Cytoscape {
     nodeElements.add(createStartNode());
     nodeElements.add(createEndNode());
     List<WorkflowAdapter.NormalizedStep> normalizedSteps = adapter.normalizedSteps();
-    // Step definition ID is not really a perfect identifier because it may not exist, using label as an identifier otherwise
+    // Step definition ID is not really a perfect identifier because it may not exist, using label
+    // as an identifier otherwise
     // TODO: Need to create another field that actually uniquely identifies the step (but still able
     // to map to input connections and state
     normalizedSteps.forEach(
@@ -163,49 +164,73 @@ public class Cytoscape {
       // 2. no inputs
       // 3. no state (questionable)
       Object inputConnections = stepDefinition.get("input_connections");
-      if (stepDefinition.get("state") == null
+      if (state == null
           && (normalizedStep.inputs.isEmpty()
               && (inputConnections == null || inputConnections.toString().equals("{}")))) {
         edgeElements.add(createEdge(START_ID, stepId));
       }
-      for (final WorkflowAdapter.Input input : normalizedStep.inputs) {
-        String sourceStepLabel = input.sourceStepLabel;
-        final String edgeId = stepId + "__to__" + sourceStepLabel;
-        final Map<String, Object> edgeData = new HashMap<>();
-        edgeData.put("id", edgeId);
-        // Look up what the step ID is based on sourceStepLabel which is either the step ID itself
-        // or the step label
-        Optional<IdAndLabel> sourceId =
-            allNodesIdsAndLabels.stream()
-                .filter(
-                    partialStep -> {
-                      boolean isLabel = sourceStepLabel.equals(partialStep.getLabel());
-                      boolean isId = sourceStepLabel.equals(partialStep.getId());
-                      return isLabel || isId;
-                    })
-                .findFirst();
-        if (sourceId.isPresent()) {
-          edgeData.put("source", sourceId.get().id);
-          // Any node that's a source of an edge is not an end node
-          endNodeIds.remove(sourceId.get().id);
-          edgeData.put("target", stepId);
-          edgeData.put("input", input.inputName);
-          edgeData.put("output", input.sourceOutputName);
-          final Map<String, Object> edgeElement = new HashMap<>();
-          edgeElement.put("group", "edges");
-          edgeElement.put("data", edgeData);
-          edgeElements.add(edgeElement);
-        } else {
-          String errorMessage =
-              String.format(
-                  "Could not find input \"%s\" from the workflow steps.", input.sourceStepLabel);
-          LOG.error(errorMessage);
+      if (state != null) {
+        LinkedHashMap linkedHashMapstate = (LinkedHashMap) state;
+        Set<String> keySet = linkedHashMapstate.keySet();
+        for (String key : keySet) {
+          createEdges(key, stepId, allNodesIdsAndLabels, edgeElements, endNodeIds, key, stepId);
         }
+      }
+
+      for (final WorkflowAdapter.Input input : normalizedStep.inputs) {
+        createEdges(
+            input.sourceStepLabel,
+            stepId,
+            allNodesIdsAndLabels,
+            edgeElements,
+            endNodeIds,
+            input.inputName,
+            input.sourceOutputName);
       }
     }
     // Create edges for end nodes to direct to the real end node
     endNodeIds.forEach(endNodeId -> edgeElements.add(createEdge(endNodeId, END_ID)));
     return elements;
+  }
+
+  private static void createEdges(
+      String sourceStepLabel,
+      String stepId,
+      Set<IdAndLabel> allNodesIdsAndLabels,
+      final List<Object> edgeElements,
+      Set<String> endNodeIds,
+      String inputName,
+      String outputName) {
+    final String edgeId = stepId + "__to__" + sourceStepLabel;
+    final Map<String, Object> edgeData = new HashMap<>();
+    edgeData.put("id", edgeId);
+    // Look up what the step ID is based on sourceStepLabel which is either the step ID itself
+    // or the step label
+    Optional<IdAndLabel> sourceId =
+        allNodesIdsAndLabels.stream()
+            .filter(
+                partialStep -> {
+                  boolean isLabel = sourceStepLabel.equals(partialStep.getLabel());
+                  boolean isId = sourceStepLabel.equals(partialStep.getId());
+                  return isLabel || isId;
+                })
+            .findFirst();
+    if (sourceId.isPresent()) {
+      edgeData.put("source", sourceId.get().id);
+      // Any node that's a source of an edge is not an end node
+      endNodeIds.remove(sourceId.get().id);
+      edgeData.put("target", stepId);
+      edgeData.put("input", inputName);
+      edgeData.put("output", outputName);
+      final Map<String, Object> edgeElement = new HashMap<>();
+      edgeElement.put("group", "edges");
+      edgeElement.put("data", edgeData);
+      edgeElements.add(edgeElement);
+    } else {
+      String errorMessage =
+          String.format("Could not find input \"%s\" from the workflow steps.", sourceStepLabel);
+      LOG.error(errorMessage);
+    }
   }
 
   static boolean isOrderIndexLabel(final String label) {
