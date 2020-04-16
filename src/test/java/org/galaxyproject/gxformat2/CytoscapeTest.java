@@ -51,6 +51,31 @@ public class CytoscapeTest {
 
   }
 
+  @Test
+  public void testExample1() throws Exception {
+    File testFile =
+            new File(
+                    "src/test/resources/jmchilton/galaxy-workflow-dockstore-example-1/Dockstore.gxwf.yml");
+    Map<String, Object> elements = Cytoscape.getElements(testFile.getAbsolutePath());
+    String json = gson.toJson(elements);
+    List<String> knownStartingSteps =
+            new java.util.ArrayList<>(Collections.singletonList("input1"));
+    List<String> knownEndingSteps =
+            new java.util.ArrayList<>(Collections.singletonList("first_cat"));
+    generalTest(knownStartingSteps, knownEndingSteps, json);
+  }
+
+  @Test
+  public void testExample2() throws Exception {
+    File testFile =
+            new File("src/test/resources/jmchilton/galaxy-workflow-dockstore-example-2/Dockstore.ga");
+    Map<String, Object> elements = Cytoscape.getElements(testFile.getAbsolutePath());
+    String json = gson.toJson(elements);
+    List<String> knownStartingSteps = new java.util.ArrayList<>(Collections.singletonList("0"));
+    List<String> knownEndingSteps = new java.util.ArrayList<>(Collections.singletonList("1"));
+    generalTest(knownStartingSteps, knownEndingSteps, json);
+  }
+
   public void generalTest(List<String> knownStartingSteps, List<String> knownEndingSteps, String json) {
     CytoscapeDAG cytoscapeDAG = gson.fromJson(json, CytoscapeDAG.class);
     Set<String> collect =
