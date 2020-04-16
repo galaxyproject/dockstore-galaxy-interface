@@ -79,26 +79,27 @@ public class CytoscapeTest {
   public void generalTest(
       List<String> knownStartingSteps, List<String> knownEndingSteps, String json) {
     CytoscapeDAG cytoscapeDAG = gson.fromJson(json, CytoscapeDAG.class);
+    List<CytoscapeDAG.Node> nodes = cytoscapeDAG.getNodes();
     Set<String> collect =
-        cytoscapeDAG.getNodes().stream()
-            .map(node -> node.getData().getId())
-            .collect(Collectors.toSet());
-    Assert.assertEquals("Ids are distinct", collect.size(), cytoscapeDAG.getNodes().size());
+        nodes.stream().map(node -> node.getData().getId()).collect(Collectors.toSet());
+    Assert.assertEquals("Ids are distinct", collect.size(), nodes.size());
+    List<CytoscapeDAG.Edge> edges = cytoscapeDAG.getEdges();
+    Assert.assertTrue("A graph has at least n - 1 edges", edges.size() >= nodes.size() - 1);
     Assert.assertTrue(collect.stream().anyMatch(thing -> thing.equals(START_ID)));
     Assert.assertTrue(collect.stream().anyMatch(thing -> thing.equals(END_ID)));
-    cytoscapeDAG.getEdges().stream()
+    edges.stream()
         .map(CytoscapeDAG.Edge::getData)
         .forEach(
             data ->
                 Assert.assertNotEquals(
                     "Source and target should be different", data.getSource(), data.getTarget()));
     List<String> startingSteps =
-        cytoscapeDAG.getEdges().stream()
+        edges.stream()
             .filter(edge -> edge.getData().getSource().equals(START_ID))
             .map(edge -> edge.getData().getTarget())
             .collect(Collectors.toList());
     List<String> endingSteps =
-        cytoscapeDAG.getEdges().stream()
+        edges.stream()
             .filter(edge -> edge.getData().getTarget().equals(END_ID))
             .map(edge -> edge.getData().getSource())
             .collect(Collectors.toList());
