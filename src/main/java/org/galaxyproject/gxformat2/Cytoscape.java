@@ -71,7 +71,8 @@ public class Cytoscape {
     nodeElements.add(createEndNode());
     List<WorkflowAdapter.NormalizedStep> normalizedSteps = adapter.normalizedSteps();
     // Step definition ID is not really a perfect identifier because it may not exist
-    // TODO: Need to create another field that actually uniquely identifies the step (but still able to map to input connections and state
+    // TODO: Need to create another field that actually uniquely identifies the step (but still able
+    // to map to input connections and state
     normalizedSteps.forEach(
         normalizedStep -> {
           if (normalizedStep.stepDefinition.get("id") == null) {

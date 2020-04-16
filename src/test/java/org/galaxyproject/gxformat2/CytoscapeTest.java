@@ -1,5 +1,9 @@
 package org.galaxyproject.gxformat2;
 
+import static org.galaxyproject.gxformat2.Cytoscape.END_ID;
+import static org.galaxyproject.gxformat2.Cytoscape.START_ID;
+
+import com.google.gson.Gson;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,19 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.galaxyproject.gxformat2.Cytoscape.END_ID;
-import static org.galaxyproject.gxformat2.Cytoscape.START_ID;
 
 public class CytoscapeTest {
   public static final Gson gson = new Gson();
 
   /**
    * Test with steps that don't have labels
+   *
    * @throws Exception Cytoscape exception
    */
   @Test
@@ -38,7 +38,8 @@ public class CytoscapeTest {
 
   /**
    * Test with steps that have labels
-   * @throws Exception  Cytoscape exception
+   *
+   * @throws Exception Cytoscape exception
    */
   @Test
   public void testGetElementsWithLabels() throws Exception {
@@ -48,27 +49,26 @@ public class CytoscapeTest {
     List<String> knownStartingSteps = new java.util.ArrayList<>(Collections.singletonList("0"));
     List<String> knownEndingSteps = new java.util.ArrayList<>(Collections.singletonList("1"));
     generalTest(knownStartingSteps, knownEndingSteps, json);
-
   }
 
   @Test
   public void testExample1() throws Exception {
     File testFile =
-            new File(
-                    "src/test/resources/jmchilton/galaxy-workflow-dockstore-example-1/Dockstore.gxwf.yml");
+        new File(
+            "src/test/resources/jmchilton/galaxy-workflow-dockstore-example-1/Dockstore.gxwf.yml");
     Map<String, Object> elements = Cytoscape.getElements(testFile.getAbsolutePath());
     String json = gson.toJson(elements);
     List<String> knownStartingSteps =
-            new java.util.ArrayList<>(Collections.singletonList("input1"));
+        new java.util.ArrayList<>(Collections.singletonList("input1"));
     List<String> knownEndingSteps =
-            new java.util.ArrayList<>(Collections.singletonList("first_cat"));
+        new java.util.ArrayList<>(Collections.singletonList("first_cat"));
     generalTest(knownStartingSteps, knownEndingSteps, json);
   }
 
   @Test
   public void testExample2() throws Exception {
     File testFile =
-            new File("src/test/resources/jmchilton/galaxy-workflow-dockstore-example-2/Dockstore.ga");
+        new File("src/test/resources/jmchilton/galaxy-workflow-dockstore-example-2/Dockstore.ga");
     Map<String, Object> elements = Cytoscape.getElements(testFile.getAbsolutePath());
     String json = gson.toJson(elements);
     List<String> knownStartingSteps = new java.util.ArrayList<>(Collections.singletonList("0"));
@@ -76,31 +76,32 @@ public class CytoscapeTest {
     generalTest(knownStartingSteps, knownEndingSteps, json);
   }
 
-  public void generalTest(List<String> knownStartingSteps, List<String> knownEndingSteps, String json) {
+  public void generalTest(
+      List<String> knownStartingSteps, List<String> knownEndingSteps, String json) {
     CytoscapeDAG cytoscapeDAG = gson.fromJson(json, CytoscapeDAG.class);
     Set<String> collect =
-            cytoscapeDAG.getNodes().stream()
-                    .map(node -> node.getData().getId())
-                    .collect(Collectors.toSet());
+        cytoscapeDAG.getNodes().stream()
+            .map(node -> node.getData().getId())
+            .collect(Collectors.toSet());
     Assert.assertEquals("Ids are distinct", collect.size(), cytoscapeDAG.getNodes().size());
     Assert.assertTrue(collect.stream().anyMatch(thing -> thing.equals(START_ID)));
     Assert.assertTrue(collect.stream().anyMatch(thing -> thing.equals(END_ID)));
     cytoscapeDAG.getEdges().stream()
-            .map(CytoscapeDAG.Edge::getData)
-            .forEach(
-                    data ->
-                            Assert.assertNotEquals(
-                                    "Source and target should be different", data.getSource(), data.getTarget()));
+        .map(CytoscapeDAG.Edge::getData)
+        .forEach(
+            data ->
+                Assert.assertNotEquals(
+                    "Source and target should be different", data.getSource(), data.getTarget()));
     List<String> startingSteps =
-            cytoscapeDAG.getEdges().stream()
-                    .filter(edge -> edge.getData().getSource().equals(START_ID))
-                    .map(edge -> edge.getData().getTarget())
-                    .collect(Collectors.toList());
+        cytoscapeDAG.getEdges().stream()
+            .filter(edge -> edge.getData().getSource().equals(START_ID))
+            .map(edge -> edge.getData().getTarget())
+            .collect(Collectors.toList());
     List<String> endingSteps =
-            cytoscapeDAG.getEdges().stream()
-                    .filter(edge -> edge.getData().getTarget().equals(END_ID))
-                    .map(edge -> edge.getData().getSource())
-                    .collect(Collectors.toList());
+        cytoscapeDAG.getEdges().stream()
+            .filter(edge -> edge.getData().getTarget().equals(END_ID))
+            .map(edge -> edge.getData().getSource())
+            .collect(Collectors.toList());
     Collections.sort(knownStartingSteps);
     Collections.sort(knownEndingSteps);
     Collections.sort(startingSteps);
