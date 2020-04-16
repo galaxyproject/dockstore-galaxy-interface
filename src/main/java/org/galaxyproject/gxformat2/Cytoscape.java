@@ -1,5 +1,8 @@
 package org.galaxyproject.gxformat2;
 
+import static org.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkflowPlugin.LOG;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,10 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkflowPlugin.LOG;
 
 public class Cytoscape {
   public static final ObjectMapper objectMapper = new ObjectMapper();
@@ -66,16 +65,23 @@ public class Cytoscape {
     nodeElements.add(createStartNode());
     nodeElements.add(createEndNode());
     List<WorkflowAdapter.NormalizedStep> normalizedSteps = adapter.normalizedSteps();
+    // Step definition ID is not really a perfect identifier because it may not exist
+    normalizedSteps.forEach(
+        normalizedStep -> {
+          if (normalizedStep.stepDefinition.get("id") == null) {
+            normalizedStep.stepDefinition.put("id", normalizedStep.label);
+          }
+        });
     Set<String> endNodeIds =
         normalizedSteps.stream()
-            .map(normalizedStep -> ((Integer) normalizedStep.stepDefinition.get("id")).toString())
+            .map(normalizedStep -> (normalizedStep.stepDefinition.get("id")).toString())
             .collect(Collectors.toSet());
     Set<IdAndLabel> allNodesIdsAndLabels =
         normalizedSteps.stream()
             .map(
                 normalizedStep -> {
                   Map<String, Object> stepDefinition = normalizedStep.stepDefinition;
-                  String id = ((Integer) stepDefinition.get("id")).toString();
+                  String id = (stepDefinition.get("id")).toString();
                   String label =
                       stepDefinition.get("label") != null
                           ? stepDefinition.get("label").toString()
@@ -83,9 +89,9 @@ public class Cytoscape {
                   return new IdAndLabel(id, label);
                 })
             .collect(Collectors.toSet());
-    for (final WorkflowAdapter.NormalizedStep normalizedStep : adapter.normalizedSteps()) {
+    for (final WorkflowAdapter.NormalizedStep normalizedStep : normalizedSteps) {
       final Map<String, Object> step = normalizedStep.stepDefinition;
-      String stepId = ((Integer) step.get("id")).toString();
+      String stepId = (step.get("id")).toString();
       String stepType = step.get("type") != null ? (String) step.get("type") : "tool";
       List<String> classes = new ArrayList<>(Collections.singletonList("type_" + stepType));
       if (stepType.equals("tool") || stepType.equals("subworkflow")) {
@@ -139,7 +145,7 @@ public class Cytoscape {
 
       // Create edge from start node if there's no input connections
       Object inputConnections = normalizedStep.stepDefinition.get("input_connections");
-      if (normalizedStep.inputs.isEmpty() && inputConnections.toString().equals("{}")) {
+      if (inputConnections != null && (normalizedStep.inputs.isEmpty() && inputConnections.toString().equals("{}"))) {
         edgeElements.add(createEdge(START_ID, stepId));
       }
       for (final WorkflowAdapter.Input input : normalizedStep.inputs) {
@@ -147,7 +153,8 @@ public class Cytoscape {
         final String edgeId = stepId + "__to__" + sourceStepLabel;
         final Map<String, Object> edgeData = new HashMap<>();
         edgeData.put("id", edgeId);
-        // Look up what the step ID is based on sourceStepLabel which is either the step ID itself or the step label
+        // Look up what the step ID is based on sourceStepLabel which is either the step ID itself
+        // or the step label
         Optional<IdAndLabel> sourceId =
             allNodesIdsAndLabels.stream()
                 .filter(
@@ -169,7 +176,9 @@ public class Cytoscape {
           edgeElement.put("data", edgeData);
           edgeElements.add(edgeElement);
         } else {
-          String errorMessage = String.format("Could not find input \"%s\" from the workflow steps.", input.sourceStepLabel);
+          String errorMessage =
+              String.format(
+                  "Could not find input \"%s\" from the workflow steps.", input.sourceStepLabel);
           LOG.error(errorMessage);
         }
       }
