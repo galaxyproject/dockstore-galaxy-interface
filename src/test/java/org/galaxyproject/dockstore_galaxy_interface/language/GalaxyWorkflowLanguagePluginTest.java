@@ -58,7 +58,7 @@ public class GalaxyWorkflowLanguagePluginTest {
     // We have name and annotation - not sure if this should just be "<name>"", or "<name>.
     // <annotation>", or
     // "<name>/n<annotation>".
-    // There's is a doc for this workflow, use that for the description
+    // There is a doc for this workflow, use that for the description
     Assert.assertEquals("This is the documentation for the workflow.", metadata.getDescription());
 
     // Test validation stubs...
