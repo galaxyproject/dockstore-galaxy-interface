@@ -253,7 +253,7 @@
 <span class="sourceLineNo">244</span><a id="line.244">            }</a>
 <span class="sourceLineNo">245</span><a id="line.245">          }</a>
 <span class="sourceLineNo">246</span><a id="line.246"></a>
-<span class="sourceLineNo">247</span><a id="line.247">          final String finalChoiceForDescription = ObjectUtils.firstNonNull(name, label, doc);</a>
+<span class="sourceLineNo">247</span><a id="line.247">          final String finalChoiceForDescription = ObjectUtils.firstNonNull(doc, name, label);</a>
 <span class="sourceLineNo">248</span><a id="line.248">          if (finalChoiceForDescription != null) {</a>
 <span class="sourceLineNo">249</span><a id="line.249">            metadata.setDescription(finalChoiceForDescription);</a>
 <span class="sourceLineNo">250</span><a id="line.250">          } else {</a>
