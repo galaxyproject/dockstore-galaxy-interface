@@ -1,5 +1,14 @@
 package org.galaxyproject.dockstore_galaxy_interface.language;
 
+import static org.galaxyproject.gxformat2.Cytoscape.END_ID;
+import static org.galaxyproject.gxformat2.Cytoscape.START_ID;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import io.dockstore.common.DescriptorLanguage;
+import io.dockstore.common.VersionTypeValidation;
+import io.dockstore.language.CompleteLanguageInterface;
+import io.dockstore.language.RecommendedLanguageInterface;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -11,13 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import io.dockstore.common.DescriptorLanguage;
-import io.dockstore.common.VersionTypeValidation;
-import io.dockstore.language.CompleteLanguageInterface;
-import io.dockstore.language.RecommendedLanguageInterface;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,9 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
-
-import static org.galaxyproject.gxformat2.Cytoscape.END_ID;
-import static org.galaxyproject.gxformat2.Cytoscape.START_ID;
 
 /** @author jmchilton */
 public class GalaxyWorkflowPlugin extends Plugin {
@@ -69,36 +68,43 @@ public class GalaxyWorkflowPlugin extends Plugin {
     }
 
     @Override
-    public List<RowData> generateToolsTable(String initialPath, String contents, Map<String, Pair<String, GenericFileType>> indexedFiles) {
+    public List<RowData> generateToolsTable(
+        String initialPath,
+        String contents,
+        Map<String, Pair<String, GenericFileType>> indexedFiles) {
       final Map<String, Object> workflow = loadWorkflow(contents);
       final Map<String, Object> elements = Cytoscape.getElements(workflow);
-      final List<Map> nodes = (List<Map>)elements.getOrDefault("nodes", Lists.newArrayList());
+      final List<Map> nodes = (List<Map>) elements.getOrDefault("nodes", Lists.newArrayList());
       removeStartAndEndNodes(nodes);
-      return nodes.stream().map(node -> {
-        final RowData rowData = new RowData();
-        final Map<String, Object> nodeData = (Map<String, Object>)node.get("data");
-        rowData.label = (String)nodeData.getOrDefault("label", "");
-        rowData.dockerContainer = (String)nodeData.getOrDefault("docker", "");
-        rowData.filename = (String)nodeData.getOrDefault("run", "");
-        // TODO: get a sane link here when Docker is hooked up
-        try {
-          rowData.link = new URL((String)node.getOrDefault("repo_link", ""));
-        } catch (MalformedURLException e) {
-          rowData.link = null;
-        }
-        rowData.rowType = RowType.TOOL;
-        rowData.toolid = (String)nodeData.getOrDefault("id", "");
-        return rowData;
-      }).collect(Collectors.toList());
+      return nodes.stream()
+          .map(
+              node -> {
+                final RowData rowData = new RowData();
+                final Map<String, Object> nodeData = (Map<String, Object>) node.get("data");
+                rowData.label = (String) nodeData.getOrDefault("label", "");
+                rowData.dockerContainer = (String) nodeData.getOrDefault("docker", "");
+                rowData.filename = (String) nodeData.getOrDefault("run", "");
+                // TODO: get a sane link here when Docker is hooked up
+                try {
+                  rowData.link = new URL((String) node.getOrDefault("repo_link", ""));
+                } catch (MalformedURLException e) {
+                  rowData.link = null;
+                }
+                rowData.rowType = RowType.TOOL;
+                rowData.toolid = (String) nodeData.getOrDefault("id", "");
+                return rowData;
+              })
+          .collect(Collectors.toList());
     }
 
     // Remove start and end nodes that were added for DAG
     private void removeStartAndEndNodes(List<Map> nodes) {
-        nodes.removeIf(node -> {
-          Map data = (Map)node.get("data");
-          String id = (String)data.get("id");
-          return START_ID.equals(id) || END_ID.equals(id);
-        });
+      nodes.removeIf(
+          node -> {
+            Map data = (Map) node.get("data");
+            String id = (String) data.get("id");
+            return START_ID.equals(id) || END_ID.equals(id);
+          });
     }
 
     @Override
