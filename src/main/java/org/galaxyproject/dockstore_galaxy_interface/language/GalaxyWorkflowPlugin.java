@@ -244,7 +244,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
             }
           }
 
-          final String finalChoiceForDescription = ObjectUtils.firstNonNull(name, label, doc);
+          final String finalChoiceForDescription = ObjectUtils.firstNonNull(doc, name, label);
           if (finalChoiceForDescription != null) {
             metadata.setDescription(finalChoiceForDescription);
           } else {
