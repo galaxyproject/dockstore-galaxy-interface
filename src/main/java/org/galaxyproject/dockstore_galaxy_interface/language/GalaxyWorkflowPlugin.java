@@ -222,6 +222,13 @@ public class GalaxyWorkflowPlugin extends Plugin {
             LOG.debug("\"label:\" is malformed");
           }
 
+          String annotation = null;
+          try {
+            annotation = (String) map.get("annotation");
+          } catch (ClassCastException e) {
+            LOG.debug("\"annotation:\" is malformed");
+          }
+
           // "doc:" added for CWL 1.0
           String doc = null;
           if (map.containsKey("doc")) {
@@ -250,7 +257,8 @@ public class GalaxyWorkflowPlugin extends Plugin {
             }
           }
 
-          final String finalChoiceForDescription = ObjectUtils.firstNonNull(doc, name, label);
+          final String finalChoiceForDescription =
+              ObjectUtils.firstNonNull(doc, annotation, name, label);
           if (finalChoiceForDescription != null) {
             metadata.setDescription(finalChoiceForDescription);
           } else {

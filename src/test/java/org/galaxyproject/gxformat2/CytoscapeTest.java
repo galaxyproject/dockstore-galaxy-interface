@@ -68,7 +68,7 @@ public class CytoscapeTest {
   @Test
   public void testExample2() throws Exception {
     File testFile =
-        new File("src/test/resources/jmchilton/galaxy-workflow-dockstore-example-2/Dockstore.ga");
+        new File("src/test/resources/mvdbeek/galaxy-workflow-dockstore-example-2/Dockstore.ga");
     Map<String, Object> elements = Cytoscape.getElements(testFile.getAbsolutePath());
     String json = gson.toJson(elements);
     List<String> knownStartingSteps = new java.util.ArrayList<>(Collections.singletonList("0"));
