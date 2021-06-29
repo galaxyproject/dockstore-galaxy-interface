@@ -25,7 +25,7 @@ import org.junit.Test;
 public class GalaxyWorkflowLanguagePluginTest {
   public static final String REPO_ID_1 = "jmchilton/galaxy-workflow-dockstore-example-1";
   public static final String REPO_FORMAT_2 = "https://raw.githubusercontent.com/" + REPO_ID_1;
-  public static final String REPO_ID_2 = "jmchilton/galaxy-workflow-dockstore-example-2";
+  public static final String REPO_ID_2 = "mvdbeek/galaxy-workflow-dockstore-example-2";
   public static final String REPO_NATIVE = "https://raw.githubusercontent.com/" + REPO_ID_2;
   public static final String EXAMPLE_FILENAME_1 = "Dockstore.gxwf.yml";
   public static final String EXAMPLE_FILENAME_1_PATH = "/" + EXAMPLE_FILENAME_1;
@@ -101,11 +101,7 @@ public class GalaxyWorkflowLanguagePluginTest {
     // We don't track these currently - especially with native format.
     Assert.assertNull(metadata.getAuthor());
     Assert.assertNull(metadata.getEmail());
-    // We have name and annotation - not sure if this should just be "<name>"", or "<name>.
-    // <annotation>", or
-    // "<name>/n<annotation>".
-    // There's no doc for this workflow, fall back to name
-    Assert.assertEquals("Test Workflow", metadata.getDescription());
+    Assert.assertEquals("This is the documentation for the workflow.", metadata.getDescription());
 
     final VersionTypeValidation wfValidation =
         plugin.validateWorkflowSet(initialPath, contents, fileMap);
