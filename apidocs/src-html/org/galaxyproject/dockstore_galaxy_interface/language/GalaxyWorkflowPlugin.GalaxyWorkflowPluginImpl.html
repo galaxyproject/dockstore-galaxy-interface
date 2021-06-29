@@ -231,60 +231,68 @@
 <span class="sourceLineNo">222</span><a id="line.222">            LOG.debug("\"label:\" is malformed");</a>
 <span class="sourceLineNo">223</span><a id="line.223">          }</a>
 <span class="sourceLineNo">224</span><a id="line.224"></a>
-<span class="sourceLineNo">225</span><a id="line.225">          // "doc:" added for CWL 1.0</a>
-<span class="sourceLineNo">226</span><a id="line.226">          String doc = null;</a>
-<span class="sourceLineNo">227</span><a id="line.227">          if (map.containsKey("doc")) {</a>
-<span class="sourceLineNo">228</span><a id="line.228">            Object objectDoc = map.get("doc");</a>
-<span class="sourceLineNo">229</span><a id="line.229">            if (objectDoc instanceof String) {</a>
-<span class="sourceLineNo">230</span><a id="line.230">              doc = (String) objectDoc;</a>
-<span class="sourceLineNo">231</span><a id="line.231">            } else if (objectDoc instanceof Map) {</a>
-<span class="sourceLineNo">232</span><a id="line.232">              Map docMap = (Map) objectDoc;</a>
-<span class="sourceLineNo">233</span><a id="line.233">              if (docMap.containsKey("$include")) {</a>
-<span class="sourceLineNo">234</span><a id="line.234">                String enclosingFile = (String) docMap.get("$include");</a>
-<span class="sourceLineNo">235</span><a id="line.235">                Optional&lt;Pair&lt;String, GenericFileType&gt;&gt; first =</a>
-<span class="sourceLineNo">236</span><a id="line.236">                    indexedFiles.values().stream()</a>
-<span class="sourceLineNo">237</span><a id="line.237">                        .filter(pair -&gt; pair.getLeft().equals(enclosingFile))</a>
-<span class="sourceLineNo">238</span><a id="line.238">                        .findFirst();</a>
-<span class="sourceLineNo">239</span><a id="line.239">                if (first.isPresent()) {</a>
-<span class="sourceLineNo">240</span><a id="line.240">                  // No way to fetch this here...</a>
-<span class="sourceLineNo">241</span><a id="line.241">                  LOG.info(</a>
-<span class="sourceLineNo">242</span><a id="line.242">                      "$include would have this but reader not passed through, not implemented");</a>
-<span class="sourceLineNo">243</span><a id="line.243">                  doc = null;</a>
-<span class="sourceLineNo">244</span><a id="line.244">                }</a>
-<span class="sourceLineNo">245</span><a id="line.245">              }</a>
-<span class="sourceLineNo">246</span><a id="line.246">            } else if (objectDoc instanceof List) {</a>
-<span class="sourceLineNo">247</span><a id="line.247">              // arrays for "doc:" added in CWL 1.1</a>
-<span class="sourceLineNo">248</span><a id="line.248">              List docList = (List) objectDoc;</a>
-<span class="sourceLineNo">249</span><a id="line.249">              doc = String.join(System.getProperty("line.separator"), docList);</a>
-<span class="sourceLineNo">250</span><a id="line.250">            }</a>
-<span class="sourceLineNo">251</span><a id="line.251">          }</a>
-<span class="sourceLineNo">252</span><a id="line.252"></a>
-<span class="sourceLineNo">253</span><a id="line.253">          final String finalChoiceForDescription = ObjectUtils.firstNonNull(doc, name, label);</a>
-<span class="sourceLineNo">254</span><a id="line.254">          if (finalChoiceForDescription != null) {</a>
-<span class="sourceLineNo">255</span><a id="line.255">            metadata.setDescription(finalChoiceForDescription);</a>
-<span class="sourceLineNo">256</span><a id="line.256">          } else {</a>
-<span class="sourceLineNo">257</span><a id="line.257">            LOG.info("Description not found!");</a>
+<span class="sourceLineNo">225</span><a id="line.225">          String annotation = null;</a>
+<span class="sourceLineNo">226</span><a id="line.226">          try {</a>
+<span class="sourceLineNo">227</span><a id="line.227">            annotation = (String) map.get("annotation");</a>
+<span class="sourceLineNo">228</span><a id="line.228">          } catch (ClassCastException e) {</a>
+<span class="sourceLineNo">229</span><a id="line.229">            LOG.debug("\"annotation:\" is malformed");</a>
+<span class="sourceLineNo">230</span><a id="line.230">          }</a>
+<span class="sourceLineNo">231</span><a id="line.231"></a>
+<span class="sourceLineNo">232</span><a id="line.232">          // "doc:" added for CWL 1.0</a>
+<span class="sourceLineNo">233</span><a id="line.233">          String doc = null;</a>
+<span class="sourceLineNo">234</span><a id="line.234">          if (map.containsKey("doc")) {</a>
+<span class="sourceLineNo">235</span><a id="line.235">            Object objectDoc = map.get("doc");</a>
+<span class="sourceLineNo">236</span><a id="line.236">            if (objectDoc instanceof String) {</a>
+<span class="sourceLineNo">237</span><a id="line.237">              doc = (String) objectDoc;</a>
+<span class="sourceLineNo">238</span><a id="line.238">            } else if (objectDoc instanceof Map) {</a>
+<span class="sourceLineNo">239</span><a id="line.239">              Map docMap = (Map) objectDoc;</a>
+<span class="sourceLineNo">240</span><a id="line.240">              if (docMap.containsKey("$include")) {</a>
+<span class="sourceLineNo">241</span><a id="line.241">                String enclosingFile = (String) docMap.get("$include");</a>
+<span class="sourceLineNo">242</span><a id="line.242">                Optional&lt;Pair&lt;String, GenericFileType&gt;&gt; first =</a>
+<span class="sourceLineNo">243</span><a id="line.243">                    indexedFiles.values().stream()</a>
+<span class="sourceLineNo">244</span><a id="line.244">                        .filter(pair -&gt; pair.getLeft().equals(enclosingFile))</a>
+<span class="sourceLineNo">245</span><a id="line.245">                        .findFirst();</a>
+<span class="sourceLineNo">246</span><a id="line.246">                if (first.isPresent()) {</a>
+<span class="sourceLineNo">247</span><a id="line.247">                  // No way to fetch this here...</a>
+<span class="sourceLineNo">248</span><a id="line.248">                  LOG.info(</a>
+<span class="sourceLineNo">249</span><a id="line.249">                      "$include would have this but reader not passed through, not implemented");</a>
+<span class="sourceLineNo">250</span><a id="line.250">                  doc = null;</a>
+<span class="sourceLineNo">251</span><a id="line.251">                }</a>
+<span class="sourceLineNo">252</span><a id="line.252">              }</a>
+<span class="sourceLineNo">253</span><a id="line.253">            } else if (objectDoc instanceof List) {</a>
+<span class="sourceLineNo">254</span><a id="line.254">              // arrays for "doc:" added in CWL 1.1</a>
+<span class="sourceLineNo">255</span><a id="line.255">              List docList = (List) objectDoc;</a>
+<span class="sourceLineNo">256</span><a id="line.256">              doc = String.join(System.getProperty("line.separator"), docList);</a>
+<span class="sourceLineNo">257</span><a id="line.257">            }</a>
 <span class="sourceLineNo">258</span><a id="line.258">          }</a>
 <span class="sourceLineNo">259</span><a id="line.259"></a>
-<span class="sourceLineNo">260</span><a id="line.260">        } catch (YAMLException | NullPointerException | ClassCastException ex) {</a>
-<span class="sourceLineNo">261</span><a id="line.261">          String message;</a>
-<span class="sourceLineNo">262</span><a id="line.262">          if (ex.getCause() != null) {</a>
-<span class="sourceLineNo">263</span><a id="line.263">            // seems to be possible to get underlying cause in some cases</a>
-<span class="sourceLineNo">264</span><a id="line.264">            message = ex.getCause().toString();</a>
-<span class="sourceLineNo">265</span><a id="line.265">          } else {</a>
-<span class="sourceLineNo">266</span><a id="line.266">            // in other cases, the above will NullPointer</a>
-<span class="sourceLineNo">267</span><a id="line.267">            message = ex.toString();</a>
-<span class="sourceLineNo">268</span><a id="line.268">          }</a>
-<span class="sourceLineNo">269</span><a id="line.269">          LOG.info("Galaxy Workflow file is malformed " + message);</a>
-<span class="sourceLineNo">270</span><a id="line.270">          // CWL parser gets to put validation information in here,</a>
-<span class="sourceLineNo">271</span><a id="line.271">          // plugin interface doesn't consume the right information though.</a>
-<span class="sourceLineNo">272</span><a id="line.272">          // https://github.com/dockstore/dockstore/blob/develop/dockstore-webservice/src/main/java/io/dockstore/webservice/languages/CWLHandler.java#L139</a>
-<span class="sourceLineNo">273</span><a id="line.273">        }</a>
-<span class="sourceLineNo">274</span><a id="line.274">      }</a>
-<span class="sourceLineNo">275</span><a id="line.275">      return metadata;</a>
-<span class="sourceLineNo">276</span><a id="line.276">    }</a>
-<span class="sourceLineNo">277</span><a id="line.277">  }</a>
-<span class="sourceLineNo">278</span><a id="line.278">}</a>
+<span class="sourceLineNo">260</span><a id="line.260">          final String finalChoiceForDescription =</a>
+<span class="sourceLineNo">261</span><a id="line.261">              ObjectUtils.firstNonNull(doc, annotation, name, label);</a>
+<span class="sourceLineNo">262</span><a id="line.262">          if (finalChoiceForDescription != null) {</a>
+<span class="sourceLineNo">263</span><a id="line.263">            metadata.setDescription(finalChoiceForDescription);</a>
+<span class="sourceLineNo">264</span><a id="line.264">          } else {</a>
+<span class="sourceLineNo">265</span><a id="line.265">            LOG.info("Description not found!");</a>
+<span class="sourceLineNo">266</span><a id="line.266">          }</a>
+<span class="sourceLineNo">267</span><a id="line.267"></a>
+<span class="sourceLineNo">268</span><a id="line.268">        } catch (YAMLException | NullPointerException | ClassCastException ex) {</a>
+<span class="sourceLineNo">269</span><a id="line.269">          String message;</a>
+<span class="sourceLineNo">270</span><a id="line.270">          if (ex.getCause() != null) {</a>
+<span class="sourceLineNo">271</span><a id="line.271">            // seems to be possible to get underlying cause in some cases</a>
+<span class="sourceLineNo">272</span><a id="line.272">            message = ex.getCause().toString();</a>
+<span class="sourceLineNo">273</span><a id="line.273">          } else {</a>
+<span class="sourceLineNo">274</span><a id="line.274">            // in other cases, the above will NullPointer</a>
+<span class="sourceLineNo">275</span><a id="line.275">            message = ex.toString();</a>
+<span class="sourceLineNo">276</span><a id="line.276">          }</a>
+<span class="sourceLineNo">277</span><a id="line.277">          LOG.info("Galaxy Workflow file is malformed " + message);</a>
+<span class="sourceLineNo">278</span><a id="line.278">          // CWL parser gets to put validation information in here,</a>
+<span class="sourceLineNo">279</span><a id="line.279">          // plugin interface doesn't consume the right information though.</a>
+<span class="sourceLineNo">280</span><a id="line.280">          // https://github.com/dockstore/dockstore/blob/develop/dockstore-webservice/src/main/java/io/dockstore/webservice/languages/CWLHandler.java#L139</a>
+<span class="sourceLineNo">281</span><a id="line.281">        }</a>
+<span class="sourceLineNo">282</span><a id="line.282">      }</a>
+<span class="sourceLineNo">283</span><a id="line.283">      return metadata;</a>
+<span class="sourceLineNo">284</span><a id="line.284">    }</a>
+<span class="sourceLineNo">285</span><a id="line.285">  }</a>
+<span class="sourceLineNo">286</span><a id="line.286">}</a>
 
 
 
