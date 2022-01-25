@@ -16,6 +16,7 @@ jobs:
     - name: checkout gxformat2 repo
       uses: actions/checkout@v2
       with:
+        ref: 0.15.0
         repository: my-org/my-tools
         path: galaxyproject/gxformat2
     - name: Set up JDK 11
