@@ -26,12 +26,12 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Run parser update
-      working-directory: dockstore
+      working-directory: dockstore-galaxy-interface
       run: bash update_parser.sh
     - name: git diff
       run: git diff
-      working-directory: dockstore
+      working-directory: dockstore-galaxy-interface
     - name: Build with Maven
       run: mvn -B clean install
-      working-directory: dockstore
+      working-directory: dockstore-galaxy-interface
     
