@@ -185,58 +185,62 @@
 <span class="sourceLineNo">176</span><a id="line.176">      new UnionLoader(new Loader[] {FloatInstance, IntegerInstance});</a>
 <span class="sourceLineNo">177</span><a id="line.177">  public static Loader&lt;java.util.Optional&lt;ToolShedRepository&gt;&gt; optional_ToolShedRepository =</a>
 <span class="sourceLineNo">178</span><a id="line.178">      new OptionalLoader(ToolShedRepository);</a>
-<span class="sourceLineNo">179</span><a id="line.179">  public static Loader&lt;java.util.Optional&lt;GalaxyType&gt;&gt; optional_GalaxyType =</a>
-<span class="sourceLineNo">180</span><a id="line.180">      new OptionalLoader(GalaxyType);</a>
-<span class="sourceLineNo">181</span><a id="line.181">  public static Loader&lt;java.util.Optional&lt;GalaxyType&gt;&gt; typedsl_optional_GalaxyType_2 =</a>
-<span class="sourceLineNo">182</span><a id="line.182">      new TypeDslLoader(optional_GalaxyType, 2);</a>
-<span class="sourceLineNo">183</span><a id="line.183">  public static Loader&lt;java.util.List&lt;WorkflowStepInput&gt;&gt; array_of_WorkflowStepInput =</a>
-<span class="sourceLineNo">184</span><a id="line.184">      new ArrayLoader(WorkflowStepInput);</a>
-<span class="sourceLineNo">185</span><a id="line.185">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
-<span class="sourceLineNo">186</span><a id="line.186">      optional_array_of_WorkflowStepInput = new OptionalLoader(array_of_WorkflowStepInput);</a>
-<span class="sourceLineNo">187</span><a id="line.187">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
-<span class="sourceLineNo">188</span><a id="line.188">      idmap_in_optional_array_of_WorkflowStepInput =</a>
-<span class="sourceLineNo">189</span><a id="line.189">          new IdMapLoader(optional_array_of_WorkflowStepInput, "id", "source");</a>
-<span class="sourceLineNo">190</span><a id="line.190">  public static Loader&lt;Object&gt; union_of_StringInstance_or_WorkflowStepOutput =</a>
-<span class="sourceLineNo">191</span><a id="line.191">      new UnionLoader(new Loader[] {StringInstance, WorkflowStepOutput});</a>
-<span class="sourceLineNo">192</span><a id="line.192">  public static Loader&lt;java.util.List&lt;Object&gt;&gt;</a>
-<span class="sourceLineNo">193</span><a id="line.193">      array_of_union_of_StringInstance_or_WorkflowStepOutput =</a>
-<span class="sourceLineNo">194</span><a id="line.194">          new ArrayLoader(union_of_StringInstance_or_WorkflowStepOutput);</a>
-<span class="sourceLineNo">195</span><a id="line.195">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
-<span class="sourceLineNo">196</span><a id="line.196">      optional_array_of_union_of_StringInstance_or_WorkflowStepOutput =</a>
-<span class="sourceLineNo">197</span><a id="line.197">          new OptionalLoader(array_of_union_of_StringInstance_or_WorkflowStepOutput);</a>
-<span class="sourceLineNo">198</span><a id="line.198">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
-<span class="sourceLineNo">199</span><a id="line.199">      idmap_out_optional_array_of_union_of_StringInstance_or_WorkflowStepOutput =</a>
-<span class="sourceLineNo">200</span><a id="line.200">          new IdMapLoader(</a>
-<span class="sourceLineNo">201</span><a id="line.201">              optional_array_of_union_of_StringInstance_or_WorkflowStepOutput, "id", "source");</a>
-<span class="sourceLineNo">202</span><a id="line.202">  public static Loader&lt;java.util.Optional&lt;WorkflowStepType&gt;&gt; optional_WorkflowStepType =</a>
-<span class="sourceLineNo">203</span><a id="line.203">      new OptionalLoader(WorkflowStepType);</a>
-<span class="sourceLineNo">204</span><a id="line.204">  public static Loader&lt;java.util.Optional&lt;WorkflowStepType&gt;&gt; typedsl_optional_WorkflowStepType_2 =</a>
-<span class="sourceLineNo">205</span><a id="line.205">      new TypeDslLoader(optional_WorkflowStepType, 2);</a>
-<span class="sourceLineNo">206</span><a id="line.206">  public static Loader&lt;java.util.Optional&lt;GalaxyWorkflow&gt;&gt; optional_GalaxyWorkflow =</a>
-<span class="sourceLineNo">207</span><a id="line.207">      new OptionalLoader(GalaxyWorkflow);</a>
-<span class="sourceLineNo">208</span><a id="line.208">  public static Loader&lt;java.util.Optional&lt;GalaxyWorkflow&gt;&gt;</a>
-<span class="sourceLineNo">209</span><a id="line.209">      uri_optional_GalaxyWorkflow_False_False_None =</a>
-<span class="sourceLineNo">210</span><a id="line.210">          new UriLoader(optional_GalaxyWorkflow, false, false, null);</a>
-<span class="sourceLineNo">211</span><a id="line.211">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
-<span class="sourceLineNo">212</span><a id="line.212">      optional_array_of_StringInstance = new OptionalLoader(array_of_StringInstance);</a>
-<span class="sourceLineNo">213</span><a id="line.213">  public static Loader&lt;Object&gt;</a>
-<span class="sourceLineNo">214</span><a id="line.214">      uri_union_of_NullInstance_or_StringInstance_or_array_of_StringInstance_False_False_2 =</a>
-<span class="sourceLineNo">215</span><a id="line.215">          new UriLoader(</a>
-<span class="sourceLineNo">216</span><a id="line.216">              union_of_NullInstance_or_StringInstance_or_array_of_StringInstance, false, false, 2);</a>
-<span class="sourceLineNo">217</span><a id="line.217">  public static Loader&lt;java.util.Optional&lt;Boolean&gt;&gt; optional_BooleanInstance =</a>
-<span class="sourceLineNo">218</span><a id="line.218">      new OptionalLoader(BooleanInstance);</a>
-<span class="sourceLineNo">219</span><a id="line.219">  public static Loader&lt;String&gt; uri_StringInstance_False_True_None =</a>
-<span class="sourceLineNo">220</span><a id="line.220">      new UriLoader(StringInstance, false, true, null);</a>
-<span class="sourceLineNo">221</span><a id="line.221">  public static Loader&lt;java.util.List&lt;WorkflowStep&gt;&gt; array_of_WorkflowStep =</a>
-<span class="sourceLineNo">222</span><a id="line.222">      new ArrayLoader(WorkflowStep);</a>
-<span class="sourceLineNo">223</span><a id="line.223">  public static Loader&lt;java.util.List&lt;Object&gt;&gt; idmap_steps_array_of_WorkflowStep =</a>
-<span class="sourceLineNo">224</span><a id="line.224">      new IdMapLoader(array_of_WorkflowStep, "id", "None");</a>
-<span class="sourceLineNo">225</span><a id="line.225">  public static Loader&lt;java.util.Optional&lt;Report&gt;&gt; optional_Report = new OptionalLoader(Report);</a>
-<span class="sourceLineNo">226</span><a id="line.226">  public static Loader&lt;java.util.List&lt;GalaxyWorkflow&gt;&gt; array_of_GalaxyWorkflow =</a>
-<span class="sourceLineNo">227</span><a id="line.227">      new ArrayLoader(GalaxyWorkflow);</a>
-<span class="sourceLineNo">228</span><a id="line.228">  public static Loader&lt;Object&gt; union_of_GalaxyWorkflow_or_array_of_GalaxyWorkflow =</a>
-<span class="sourceLineNo">229</span><a id="line.229">      new UnionLoader(new Loader[] {GalaxyWorkflow, array_of_GalaxyWorkflow});</a>
-<span class="sourceLineNo">230</span><a id="line.230">}</a>
+<span class="sourceLineNo">179</span><a id="line.179">  public static Loader&lt;Object&gt; union_of_GalaxyType_or_StringInstance_or_NullInstance =</a>
+<span class="sourceLineNo">180</span><a id="line.180">      new UnionLoader(new Loader[] {GalaxyType, StringInstance, NullInstance});</a>
+<span class="sourceLineNo">181</span><a id="line.181">  public static Loader&lt;Object&gt; typedsl_union_of_GalaxyType_or_StringInstance_or_NullInstance_2 =</a>
+<span class="sourceLineNo">182</span><a id="line.182">      new TypeDslLoader(union_of_GalaxyType_or_StringInstance_or_NullInstance, 2);</a>
+<span class="sourceLineNo">183</span><a id="line.183">  public static Loader&lt;java.util.Optional&lt;GalaxyType&gt;&gt; optional_GalaxyType =</a>
+<span class="sourceLineNo">184</span><a id="line.184">      new OptionalLoader(GalaxyType);</a>
+<span class="sourceLineNo">185</span><a id="line.185">  public static Loader&lt;java.util.Optional&lt;GalaxyType&gt;&gt; typedsl_optional_GalaxyType_2 =</a>
+<span class="sourceLineNo">186</span><a id="line.186">      new TypeDslLoader(optional_GalaxyType, 2);</a>
+<span class="sourceLineNo">187</span><a id="line.187">  public static Loader&lt;java.util.List&lt;WorkflowStepInput&gt;&gt; array_of_WorkflowStepInput =</a>
+<span class="sourceLineNo">188</span><a id="line.188">      new ArrayLoader(WorkflowStepInput);</a>
+<span class="sourceLineNo">189</span><a id="line.189">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
+<span class="sourceLineNo">190</span><a id="line.190">      optional_array_of_WorkflowStepInput = new OptionalLoader(array_of_WorkflowStepInput);</a>
+<span class="sourceLineNo">191</span><a id="line.191">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
+<span class="sourceLineNo">192</span><a id="line.192">      idmap_in_optional_array_of_WorkflowStepInput =</a>
+<span class="sourceLineNo">193</span><a id="line.193">          new IdMapLoader(optional_array_of_WorkflowStepInput, "id", "source");</a>
+<span class="sourceLineNo">194</span><a id="line.194">  public static Loader&lt;Object&gt; union_of_StringInstance_or_WorkflowStepOutput =</a>
+<span class="sourceLineNo">195</span><a id="line.195">      new UnionLoader(new Loader[] {StringInstance, WorkflowStepOutput});</a>
+<span class="sourceLineNo">196</span><a id="line.196">  public static Loader&lt;java.util.List&lt;Object&gt;&gt;</a>
+<span class="sourceLineNo">197</span><a id="line.197">      array_of_union_of_StringInstance_or_WorkflowStepOutput =</a>
+<span class="sourceLineNo">198</span><a id="line.198">          new ArrayLoader(union_of_StringInstance_or_WorkflowStepOutput);</a>
+<span class="sourceLineNo">199</span><a id="line.199">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
+<span class="sourceLineNo">200</span><a id="line.200">      optional_array_of_union_of_StringInstance_or_WorkflowStepOutput =</a>
+<span class="sourceLineNo">201</span><a id="line.201">          new OptionalLoader(array_of_union_of_StringInstance_or_WorkflowStepOutput);</a>
+<span class="sourceLineNo">202</span><a id="line.202">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
+<span class="sourceLineNo">203</span><a id="line.203">      idmap_out_optional_array_of_union_of_StringInstance_or_WorkflowStepOutput =</a>
+<span class="sourceLineNo">204</span><a id="line.204">          new IdMapLoader(</a>
+<span class="sourceLineNo">205</span><a id="line.205">              optional_array_of_union_of_StringInstance_or_WorkflowStepOutput, "id", "source");</a>
+<span class="sourceLineNo">206</span><a id="line.206">  public static Loader&lt;java.util.Optional&lt;WorkflowStepType&gt;&gt; optional_WorkflowStepType =</a>
+<span class="sourceLineNo">207</span><a id="line.207">      new OptionalLoader(WorkflowStepType);</a>
+<span class="sourceLineNo">208</span><a id="line.208">  public static Loader&lt;java.util.Optional&lt;WorkflowStepType&gt;&gt; typedsl_optional_WorkflowStepType_2 =</a>
+<span class="sourceLineNo">209</span><a id="line.209">      new TypeDslLoader(optional_WorkflowStepType, 2);</a>
+<span class="sourceLineNo">210</span><a id="line.210">  public static Loader&lt;java.util.Optional&lt;GalaxyWorkflow&gt;&gt; optional_GalaxyWorkflow =</a>
+<span class="sourceLineNo">211</span><a id="line.211">      new OptionalLoader(GalaxyWorkflow);</a>
+<span class="sourceLineNo">212</span><a id="line.212">  public static Loader&lt;java.util.Optional&lt;GalaxyWorkflow&gt;&gt;</a>
+<span class="sourceLineNo">213</span><a id="line.213">      uri_optional_GalaxyWorkflow_False_False_None =</a>
+<span class="sourceLineNo">214</span><a id="line.214">          new UriLoader(optional_GalaxyWorkflow, false, false, null);</a>
+<span class="sourceLineNo">215</span><a id="line.215">  public static Loader&lt;java.util.Optional&lt;java.util.List&lt;Object&gt;&gt;&gt;</a>
+<span class="sourceLineNo">216</span><a id="line.216">      optional_array_of_StringInstance = new OptionalLoader(array_of_StringInstance);</a>
+<span class="sourceLineNo">217</span><a id="line.217">  public static Loader&lt;Object&gt;</a>
+<span class="sourceLineNo">218</span><a id="line.218">      uri_union_of_NullInstance_or_StringInstance_or_array_of_StringInstance_False_False_2 =</a>
+<span class="sourceLineNo">219</span><a id="line.219">          new UriLoader(</a>
+<span class="sourceLineNo">220</span><a id="line.220">              union_of_NullInstance_or_StringInstance_or_array_of_StringInstance, false, false, 2);</a>
+<span class="sourceLineNo">221</span><a id="line.221">  public static Loader&lt;java.util.Optional&lt;Boolean&gt;&gt; optional_BooleanInstance =</a>
+<span class="sourceLineNo">222</span><a id="line.222">      new OptionalLoader(BooleanInstance);</a>
+<span class="sourceLineNo">223</span><a id="line.223">  public static Loader&lt;String&gt; uri_StringInstance_False_True_None =</a>
+<span class="sourceLineNo">224</span><a id="line.224">      new UriLoader(StringInstance, false, true, null);</a>
+<span class="sourceLineNo">225</span><a id="line.225">  public static Loader&lt;java.util.List&lt;WorkflowStep&gt;&gt; array_of_WorkflowStep =</a>
+<span class="sourceLineNo">226</span><a id="line.226">      new ArrayLoader(WorkflowStep);</a>
+<span class="sourceLineNo">227</span><a id="line.227">  public static Loader&lt;java.util.List&lt;Object&gt;&gt; idmap_steps_array_of_WorkflowStep =</a>
+<span class="sourceLineNo">228</span><a id="line.228">      new IdMapLoader(array_of_WorkflowStep, "id", "None");</a>
+<span class="sourceLineNo">229</span><a id="line.229">  public static Loader&lt;java.util.Optional&lt;Report&gt;&gt; optional_Report = new OptionalLoader(Report);</a>
+<span class="sourceLineNo">230</span><a id="line.230">  public static Loader&lt;java.util.List&lt;GalaxyWorkflow&gt;&gt; array_of_GalaxyWorkflow =</a>
+<span class="sourceLineNo">231</span><a id="line.231">      new ArrayLoader(GalaxyWorkflow);</a>
+<span class="sourceLineNo">232</span><a id="line.232">  public static Loader&lt;Object&gt; union_of_GalaxyWorkflow_or_array_of_GalaxyWorkflow =</a>
+<span class="sourceLineNo">233</span><a id="line.233">      new UnionLoader(new Loader[] {GalaxyWorkflow, array_of_GalaxyWorkflow});</a>
+<span class="sourceLineNo">234</span><a id="line.234">}</a>
 
 
 
