@@ -1,0 +1,37 @@
+# this job checks that we haven't tampered with any (more) generated code and should be updated when updating the version of gxformat
+name: Check bindings
+
+on: push
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout this repo
+      uses: actions/checkout@v2
+      with:
+        path: dockstore-galaxy-interface
+    - name: checkout gxformat2 repo
+      uses: actions/checkout@v2
+      with:
+        ref: 0.15.0
+        repository: galaxyproject/gxformat2
+        path: gxformat2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    - name: Run parser update
+      working-directory: dockstore-galaxy-interface
+      run: bash update_parser.sh
+    - name: git diff
+      run: git diff
+      working-directory: dockstore-galaxy-interface
+    - name: Build with Maven
+      run: mvn -B clean install
+      working-directory: dockstore-galaxy-interface
+    
