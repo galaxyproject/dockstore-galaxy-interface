@@ -233,6 +233,12 @@
             <version>${jackson.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.snakeyaml</groupId>
+            <artifactId>snakeyaml-engine</artifactId>
+            <version>2.3</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
 

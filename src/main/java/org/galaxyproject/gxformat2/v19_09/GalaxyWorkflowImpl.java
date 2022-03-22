@@ -1,3 +1,17 @@
+// Copyright Common Workflow Language project contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.galaxyproject.gxformat2.v19_09;
 
 import org.galaxyproject.gxformat2.v19_09.utils.LoaderInstances;
@@ -45,6 +59,15 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
    */
   public java.util.Optional<String> getId() {
     return this.id;
+  }
+
+  private String class_;
+
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#GalaxyWorkflow/class</I><br>
+   */
+  public String getClass_() {
+    return this.class_;
   }
 
   private java.util.Optional<String> label;
@@ -131,15 +154,6 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
     return this.uuid;
   }
 
-  private String class_;
-
-  /**
-   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#GalaxyWorkflow/class</I><br>
-   */
-  public String getClass_() {
-    return this.class_;
-  }
-
   private java.util.List<Object> steps;
 
   /**
@@ -169,6 +183,21 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
    */
   public java.util.Optional<Report> getReport() {
     return this.report;
+  }
+
+  private java.util.Optional<java.util.List<Object>> tags;
+
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#GalaxyWorkflow/tags</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * Tags for the workflow. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<java.util.List<Object>> getTags() {
+    return this.tags;
   }
 
   /**
@@ -219,6 +248,7 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
       id = null;
     }
 
+    Boolean __original_is_null = id == null;
     if (id == null) {
       if (__docRoot != null) {
         id = java.util.Optional.of(__docRoot);
@@ -226,7 +256,21 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
         id = java.util.Optional.of("_:" + java.util.UUID.randomUUID().toString());
       }
     }
-    __baseUri = (String) id.orElse(null);
+    if (__original_is_null) {
+      __baseUri = __baseUri_;
+    } else {
+      __baseUri = (String) id.orElse(null);
+    }
+    String class_;
+    try {
+      class_ =
+          LoaderInstances.uri_StringInstance_False_True_None.loadField(
+              __doc.get("class"), __baseUri, __loadingOptions);
+    } catch (ValidationException e) {
+      class_ = null; // won't be used but prevents compiler from complaining.
+      final String __message = "the `class` field is not valid because:";
+      __errors.add(new ValidationException(__message, e));
+    }
     java.util.Optional<String> label;
 
     if (__doc.containsKey("label")) {
@@ -295,16 +339,6 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
     } else {
       uuid = null;
     }
-    String class_;
-    try {
-      class_ =
-          LoaderInstances.uri_StringInstance_False_True_None.loadField(
-              __doc.get("class"), __baseUri, __loadingOptions);
-    } catch (ValidationException e) {
-      class_ = null; // won't be used but prevents compiler from complaining.
-      final String __message = "the `class` field is not valid because:";
-      __errors.add(new ValidationException(__message, e));
-    }
     java.util.List<Object> steps;
     try {
       steps =
@@ -331,6 +365,22 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
     } else {
       report = null;
     }
+    java.util.Optional<java.util.List<Object>> tags;
+
+    if (__doc.containsKey("tags")) {
+      try {
+        tags =
+            LoaderInstances.optional_array_of_StringInstance.loadField(
+                __doc.get("tags"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        tags = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `tags` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      tags = null;
+    }
     if (!__errors.isEmpty()) {
       throw new ValidationException("Trying 'RecordField'", __errors);
     }
@@ -343,5 +393,6 @@ public class GalaxyWorkflowImpl extends SavableImpl implements GalaxyWorkflow {
     this.class_ = (String) class_;
     this.steps = (java.util.List<Object>) steps;
     this.report = (java.util.Optional<Report>) report;
+    this.tags = (java.util.Optional<java.util.List<Object>>) tags;
   }
 }

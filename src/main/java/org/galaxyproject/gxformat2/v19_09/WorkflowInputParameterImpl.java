@@ -1,3 +1,17 @@
+// Copyright Common Workflow Language project contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.galaxyproject.gxformat2.v19_09;
 
 import org.galaxyproject.gxformat2.v19_09.utils.LoaderInstances;
@@ -27,6 +41,21 @@ public class WorkflowInputParameterImpl extends SavableImpl implements WorkflowI
    */
   public java.util.Optional<String> getId() {
     return this.id;
+  }
+
+  private java.util.Optional<String> label;
+
+  /**
+   * Getter for property <I>https://w3id.org/cwl/cwl#Labeled/label</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * A short, human-readable label of this object. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<String> getLabel() {
+    return this.label;
   }
 
   private Object doc;
@@ -86,6 +115,55 @@ public class WorkflowInputParameterImpl extends SavableImpl implements WorkflowI
     return this.type;
   }
 
+  private java.util.Optional<Boolean> optional;
+
+  /**
+   * Getter for property
+   * <I>https://galaxyproject.org/gxformat2/v19_09#WorkflowInputParameter/optional</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * If set to true, `WorkflowInputParameter` is not required to submit the workflow. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<Boolean> getOptional() {
+    return this.optional;
+  }
+
+  private java.util.Optional<java.util.List<Object>> format;
+
+  /**
+   * Getter for property
+   * <I>https://galaxyproject.org/gxformat2/v19_09#WorkflowInputParameter/format</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * Specify datatype extension for valid input datasets. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<java.util.List<Object>> getFormat() {
+    return this.format;
+  }
+
+  private java.util.Optional<String> collection_type;
+
+  /**
+   * Getter for property
+   * <I>https://galaxyproject.org/gxformat2/v19_09#WorkflowInputParameter/collection_type</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * Collection type (defaults to `list` if `type` is `collection`). Nested collection types are
+   * separated with colons, e.g. `list:list:paired`. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<String> getCollection_type() {
+    return this.collection_type;
+  }
+
   /**
    * Used by {@link org.galaxyproject.gxformat2.v19_09.utils.RootLoader} to construct instances of
    * WorkflowInputParameterImpl.
@@ -134,6 +212,7 @@ public class WorkflowInputParameterImpl extends SavableImpl implements WorkflowI
       id = null;
     }
 
+    Boolean __original_is_null = id == null;
     if (id == null) {
       if (__docRoot != null) {
         id = java.util.Optional.of(__docRoot);
@@ -141,7 +220,27 @@ public class WorkflowInputParameterImpl extends SavableImpl implements WorkflowI
         id = java.util.Optional.of("_:" + java.util.UUID.randomUUID().toString());
       }
     }
-    __baseUri = (String) id.orElse(null);
+    if (__original_is_null) {
+      __baseUri = __baseUri_;
+    } else {
+      __baseUri = (String) id.orElse(null);
+    }
+    java.util.Optional<String> label;
+
+    if (__doc.containsKey("label")) {
+      try {
+        label =
+            LoaderInstances.optional_StringInstance.loadField(
+                __doc.get("label"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        label = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `label` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      label = null;
+    }
     Object doc;
 
     if (__doc.containsKey("doc")) {
@@ -206,13 +305,65 @@ public class WorkflowInputParameterImpl extends SavableImpl implements WorkflowI
     } else {
       type = null;
     }
+    java.util.Optional<Boolean> optional;
+
+    if (__doc.containsKey("optional")) {
+      try {
+        optional =
+            LoaderInstances.optional_BooleanInstance.loadField(
+                __doc.get("optional"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        optional = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `optional` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      optional = null;
+    }
+    java.util.Optional<java.util.List<Object>> format;
+
+    if (__doc.containsKey("format")) {
+      try {
+        format =
+            LoaderInstances.optional_array_of_StringInstance.loadField(
+                __doc.get("format"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        format = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `format` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      format = null;
+    }
+    java.util.Optional<String> collection_type;
+
+    if (__doc.containsKey("collection_type")) {
+      try {
+        collection_type =
+            LoaderInstances.optional_StringInstance.loadField(
+                __doc.get("collection_type"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        collection_type = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `collection_type` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      collection_type = null;
+    }
     if (!__errors.isEmpty()) {
       throw new ValidationException("Trying 'RecordField'", __errors);
     }
+    this.label = (java.util.Optional<String>) label;
     this.doc = (Object) doc;
     this.id = (java.util.Optional<String>) id;
     this.default_ = (java.util.Optional<Object>) default_;
     this.position = (java.util.Optional<StepPosition>) position;
     this.type = (Object) type;
+    this.optional = (java.util.Optional<Boolean>) optional;
+    this.format = (java.util.Optional<java.util.List<Object>>) format;
+    this.collection_type = (java.util.Optional<String>) collection_type;
   }
 }
