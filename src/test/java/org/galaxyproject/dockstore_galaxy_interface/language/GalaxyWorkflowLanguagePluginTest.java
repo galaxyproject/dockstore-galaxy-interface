@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class GalaxyWorkflowLanguagePluginTest {
-  public static final String REPO_ID_1 = "jmchilton/galaxy-workflow-dockstore-example-1";
+  public static final String REPO_ID_1 = "svonworl/galaxy-workflow-dockstore-example-1";
   public static final String REPO_FORMAT_2 = "https://raw.githubusercontent.com/" + REPO_ID_1;
   public static final String REPO_ID_2 = "mvdbeek/galaxy-workflow-dockstore-example-2";
   public static final String REPO_NATIVE = "https://raw.githubusercontent.com/" + REPO_ID_2;
