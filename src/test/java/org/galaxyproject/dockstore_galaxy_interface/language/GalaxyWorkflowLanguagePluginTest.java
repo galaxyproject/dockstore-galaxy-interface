@@ -160,6 +160,21 @@ public class GalaxyWorkflowLanguagePluginTest {
   }
 
   @Test
+  public void testPrestoImmuneValidation() {
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+        new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
+    final ResourceFileReader reader = new ResourceFileReader("nebiolabs");
+    final String initialPath = "presto_immune_sequencing_v3.20.ga";
+    final String contents = reader.readFile(initialPath);
+    final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap =
+        plugin.indexWorkflowFiles(initialPath, contents, reader);
+    Assert.assertEquals(0, fileMap.size());
+    final VersionTypeValidation wfValidation =
+        plugin.validateWorkflowSet(initialPath, contents, fileMap);
+    Assert.assertTrue(wfValidation.isValid());
+  }
+
+  @Test
   public void testInitialPathPattern() {
     // TODO: This doesn't seem to be called by Dockstore anywhere - is that right?
     final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
