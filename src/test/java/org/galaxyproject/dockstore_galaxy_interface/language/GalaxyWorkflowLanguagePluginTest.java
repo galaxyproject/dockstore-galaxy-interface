@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,13 +42,14 @@ public class GalaxyWorkflowLanguagePluginTest {
     final HttpFileReader reader = new HttpFileReader(REPO_FORMAT_2);
     final String initialPath = EXAMPLE_FILENAME_1_PATH;
     final String contents = reader.readFile(EXAMPLE_FILENAME_1);
-    final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap =
+    final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
         plugin.indexWorkflowFiles(initialPath, contents, reader);
     Assert.assertEquals(1, fileMap.size());
-    final Pair<String, MinimalLanguageInterface.GenericFileType> discoveredFile =
+    final MinimalLanguageInterface.FileMetadata discoveredFile =
         fileMap.get("/Dockstore.gxwf-test.yml");
     Assert.assertEquals(
-        discoveredFile.getRight(), MinimalLanguageInterface.GenericFileType.TEST_PARAMETER_FILE);
+        discoveredFile.genericFileType(),
+        MinimalLanguageInterface.GenericFileType.TEST_PARAMETER_FILE);
     final RecommendedLanguageInterface.WorkflowMetadata metadata =
         plugin.parseWorkflowForMetadata(initialPath, contents, fileMap);
     // We don't track these currently, but we could pull out the CWL parsing and mimic that.
@@ -88,13 +88,13 @@ public class GalaxyWorkflowLanguagePluginTest {
     final HttpFileReader reader = new HttpFileReader(REPO_NATIVE);
     final String initialPath = EXAMPLE_FILENAME_NATIVE_PATH;
     final String contents = reader.readFile(EXAMPLE_FILENAME_NATIVE);
-    final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap =
+    final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
         plugin.indexWorkflowFiles(initialPath, contents, reader);
     Assert.assertEquals(1, fileMap.size());
-    final Pair<String, MinimalLanguageInterface.GenericFileType> discoveredFile =
-        fileMap.get("/Dockstore-test.yml");
+    final MinimalLanguageInterface.FileMetadata discoveredFile = fileMap.get("/Dockstore-test.yml");
     Assert.assertEquals(
-        discoveredFile.getRight(), MinimalLanguageInterface.GenericFileType.TEST_PARAMETER_FILE);
+        discoveredFile.genericFileType(),
+        MinimalLanguageInterface.GenericFileType.TEST_PARAMETER_FILE);
     final RecommendedLanguageInterface.WorkflowMetadata metadata =
         plugin.parseWorkflowForMetadata(initialPath, contents, fileMap);
 
@@ -128,7 +128,7 @@ public class GalaxyWorkflowLanguagePluginTest {
     final ResourceFileReader reader = new ResourceFileReader("invalid_report_ga");
     final String initialPath = "missing_markdown.ga";
     final String contents = reader.readFile(initialPath);
-    final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap =
+    final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
         plugin.indexWorkflowFiles(initialPath, contents, reader);
     Assert.assertEquals(0, fileMap.size());
     final VersionTypeValidation wfValidation =
@@ -147,7 +147,7 @@ public class GalaxyWorkflowLanguagePluginTest {
     final ResourceFileReader reader = new ResourceFileReader("invalid_report_ga");
     final String initialPath = "two_validation_errors.ga";
     final String contents = reader.readFile(initialPath);
-    final Map<String, Pair<String, MinimalLanguageInterface.GenericFileType>> fileMap =
+    final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
         plugin.indexWorkflowFiles(initialPath, contents, reader);
     Assert.assertEquals(0, fileMap.size());
     final VersionTypeValidation wfValidation =
