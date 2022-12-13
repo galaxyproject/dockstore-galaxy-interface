@@ -1,5 +1,7 @@
 package org.galaxyproject.dockstore_galaxy_interface.language;
 
+import static org.junit.Assert.assertTrue;
+
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,7 +46,10 @@ public class GalaxyWorkflowLanguagePluginTest {
     final String contents = reader.readFile(EXAMPLE_FILENAME_1);
     final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
         plugin.indexWorkflowFiles(initialPath, contents, reader);
-    Assert.assertEquals(1, fileMap.size());
+    Assert.assertEquals(2, fileMap.size());
+    assertTrue(
+        fileMap.entrySet().stream()
+            .anyMatch(entry -> entry.getValue().languageVersion().equals("gxformat2")));
     final MinimalLanguageInterface.FileMetadata discoveredFile =
         fileMap.get("/Dockstore.gxwf-test.yml");
     Assert.assertEquals(
@@ -64,18 +69,17 @@ public class GalaxyWorkflowLanguagePluginTest {
     // Test validation stubs...
     final VersionTypeValidation wfValidation =
         plugin.validateWorkflowSet(initialPath, contents, fileMap);
-    Assert.assertTrue(wfValidation.isValid());
+    assertTrue(wfValidation.isValid());
     final VersionTypeValidation testValidation = plugin.validateTestParameterSet(fileMap);
-    Assert.assertTrue(testValidation.isValid());
+    assertTrue(testValidation.isValid());
     // No validation messages because everything is fine...
-    Assert.assertTrue(wfValidation.getMessage().isEmpty());
+    assertTrue(wfValidation.getMessage().isEmpty());
 
     final Map<String, Object> cytoscapeElements =
         plugin.loadCytoscapeElements(initialPath, contents, fileMap);
     // do a sanity check for a valid cytoscape JSON
     // http://manual.cytoscape.org/en/stable/Supported_Network_File_Formats.html#cytoscape-js-json
-    Assert.assertTrue(
-        cytoscapeElements.containsKey("nodes") && cytoscapeElements.containsKey("edges"));
+    assertTrue(cytoscapeElements.containsKey("nodes") && cytoscapeElements.containsKey("edges"));
     final List<CompleteLanguageInterface.RowData> rowData =
         plugin.generateToolsTable(initialPath, contents, fileMap);
     Assert.assertFalse(rowData.isEmpty());
@@ -90,7 +94,10 @@ public class GalaxyWorkflowLanguagePluginTest {
     final String contents = reader.readFile(EXAMPLE_FILENAME_NATIVE);
     final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
         plugin.indexWorkflowFiles(initialPath, contents, reader);
-    Assert.assertEquals(1, fileMap.size());
+    Assert.assertEquals(2, fileMap.size());
+    assertTrue(
+        fileMap.entrySet().stream()
+            .anyMatch(entry -> entry.getValue().languageVersion().equals("gxformat1")));
     final MinimalLanguageInterface.FileMetadata discoveredFile = fileMap.get("/Dockstore-test.yml");
     Assert.assertEquals(
         discoveredFile.genericFileType(),
@@ -105,20 +112,32 @@ public class GalaxyWorkflowLanguagePluginTest {
 
     final VersionTypeValidation wfValidation =
         plugin.validateWorkflowSet(initialPath, contents, fileMap);
-    Assert.assertTrue(wfValidation.isValid());
+    assertTrue(wfValidation.isValid());
     // No validation messages because everything is fine...
-    Assert.assertTrue(wfValidation.getMessage().isEmpty());
+    assertTrue(wfValidation.getMessage().isEmpty());
 
     final Map<String, Object> cytoscapeElements =
         plugin.loadCytoscapeElements(initialPath, contents, fileMap);
     // do a sanity check for a valid cytoscape JSON
     // http://manual.cytoscape.org/en/stable/Supported_Network_File_Formats.html#cytoscape-js-json
-    Assert.assertTrue(
-        cytoscapeElements.containsKey("nodes") && cytoscapeElements.containsKey("edges"));
+    assertTrue(cytoscapeElements.containsKey("nodes") && cytoscapeElements.containsKey("edges"));
 
     final List<CompleteLanguageInterface.RowData> rowData =
         plugin.generateToolsTable(initialPath, contents, fileMap);
     Assert.assertFalse(rowData.isEmpty());
+  }
+
+  @Test
+  public void testCompletelyInvalidFile() {
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+        new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
+    final ResourceFileReader reader = new ResourceFileReader("invalid_file");
+    final String initialPath = "invalid.png";
+    final String contents = reader.readFile(initialPath);
+    final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
+        plugin.indexWorkflowFiles(initialPath, contents, reader);
+    assertTrue(
+        fileMap.entrySet().stream().allMatch(entry -> entry.getValue().languageVersion() == null));
   }
 
   @Test
@@ -130,14 +149,14 @@ public class GalaxyWorkflowLanguagePluginTest {
     final String contents = reader.readFile(initialPath);
     final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
         plugin.indexWorkflowFiles(initialPath, contents, reader);
-    Assert.assertEquals(0, fileMap.size());
+    Assert.assertEquals(1, fileMap.size());
     final VersionTypeValidation wfValidation =
         plugin.validateWorkflowSet(initialPath, contents, fileMap);
     Assert.assertFalse(wfValidation.isValid());
     final Map<String, String> messages = wfValidation.getMessage();
-    Assert.assertTrue(messages.containsKey(initialPath));
+    assertTrue(messages.containsKey(initialPath));
     final String validationProblem = messages.get(initialPath);
-    Assert.assertTrue(validationProblem.indexOf("markdown") > 0);
+    assertTrue(validationProblem.indexOf("markdown") > 0);
   }
 
   @Test
@@ -149,14 +168,14 @@ public class GalaxyWorkflowLanguagePluginTest {
     final String contents = reader.readFile(initialPath);
     final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
         plugin.indexWorkflowFiles(initialPath, contents, reader);
-    Assert.assertEquals(0, fileMap.size());
+    Assert.assertEquals(1, fileMap.size());
     final VersionTypeValidation wfValidation =
         plugin.validateWorkflowSet(initialPath, contents, fileMap);
     Assert.assertFalse(wfValidation.isValid());
     final Map<String, String> messages = wfValidation.getMessage();
     final String validationProblem = messages.get(initialPath);
-    Assert.assertTrue(validationProblem.contains("- .. ERROR"));
-    Assert.assertTrue(validationProblem.contains("- .. WARNING"));
+    assertTrue(validationProblem.contains("- .. ERROR"));
+    assertTrue(validationProblem.contains("- .. WARNING"));
   }
 
   @Test
@@ -165,11 +184,11 @@ public class GalaxyWorkflowLanguagePluginTest {
     final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
         new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
     Matcher m = plugin.initialPathPattern().matcher(EXAMPLE_FILENAME_1_PATH);
-    Assert.assertTrue("File name matches for initial path pattern", m.matches());
+    assertTrue("File name matches for initial path pattern", m.matches());
     m = plugin.initialPathPattern().matcher(EXAMPLE_FILENAME_2_PATH);
-    Assert.assertTrue("File name matches for initial path pattern", m.matches());
+    assertTrue("File name matches for initial path pattern", m.matches());
     m = plugin.initialPathPattern().matcher(EXAMPLE_FILENAME_NATIVE_PATH);
-    Assert.assertTrue("File name matches for initial path pattern (native workflows)", m.matches());
+    assertTrue("File name matches for initial path pattern (native workflows)", m.matches());
     m = plugin.initialPathPattern().matcher("/Dockerstore.cwl");
     Assert.assertFalse(m.matches());
     m = plugin.initialPathPattern().matcher("/Dockerstore.nf");

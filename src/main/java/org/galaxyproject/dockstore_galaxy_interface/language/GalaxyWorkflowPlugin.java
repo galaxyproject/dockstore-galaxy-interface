@@ -3,6 +3,7 @@ package org.galaxyproject.dockstore_galaxy_interface.language;
 import static org.galaxyproject.gxformat2.Cytoscape.END_ID;
 import static org.galaxyproject.gxformat2.Cytoscape.START_ID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.dockstore.common.DescriptorLanguage;
@@ -50,6 +51,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
 
   @Extension
   public static class GalaxyWorkflowPluginImpl implements CompleteLanguageInterface {
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public String launchInstructions(String trsID) {
@@ -144,6 +146,25 @@ public class GalaxyWorkflowPlugin extends Plugin {
     public Map<String, FileMetadata> indexWorkflowFiles(
         final String initialPath, final String contents, final FileReader reader) {
       Map<String, FileMetadata> results = new HashMap<>();
+
+      // identify filetype of initial descriptor, copied from Lint.java
+      String languageVersion = null;
+      try {
+        final Map<String, Object> workflowMap = loadWorkflow(contents);
+        final String wfClass = (String) workflowMap.get("class");
+        if (wfClass != null && wfClass.equals("GalaxyWorkflow")) {
+          languageVersion = "gxformat2";
+        } else {
+          languageVersion = "gxformat1";
+        }
+      } catch (Exception e) {
+        // do nothing
+      }
+
+      results.put(
+          initialPath,
+          new FileMetadata(contents, GenericFileType.IMPORTED_DESCRIPTOR, languageVersion));
+
       final Optional<String> testParameterFile = findTestParameterFile(initialPath, reader);
       testParameterFile.ifPresent(
           // TODO - get language version into here
