@@ -10,7 +10,7 @@
 
     <properties>
         <github.url>scm:git:git@github.com:galaxyproject/dockstore-galaxy-interface.git</github.url>
-        <dockstore.version>1.12.3</dockstore.version>
+        <dockstore.version>1.11.2</dockstore.version>
         <slf4j.version>1.7.26</slf4j.version>
         <plugin.id>${project.artifactId}</plugin.id>
         <plugin.class>org.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkflowPlugin</plugin.class>
