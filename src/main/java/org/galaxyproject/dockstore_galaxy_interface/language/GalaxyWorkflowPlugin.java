@@ -151,8 +151,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
       String languageVersion = null;
       try {
         final Map<String, Object> workflowMap = loadWorkflow(contents);
-        final String wfClass = (String) workflowMap.get("class");
-        if (wfClass != null && wfClass.equals("GalaxyWorkflow")) {
+        if (Lint.isGXFormat2Workflow(workflowMap)) {
           languageVersion = "gxformat2";
         } else {
           languageVersion = "gxformat1";

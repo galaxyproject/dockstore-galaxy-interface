@@ -16,6 +16,7 @@
         <plugin.class>org.galaxyproject.dockstore_galaxy_interface.language.GalaxyWorkflowPlugin</plugin.class>
         <plugin.version>${project.version}</plugin.version>
         <jackson.version>2.13.4</jackson.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <plugin.provider>jmchilton</plugin.provider>
         <plugin.dependencies />
     </properties>
