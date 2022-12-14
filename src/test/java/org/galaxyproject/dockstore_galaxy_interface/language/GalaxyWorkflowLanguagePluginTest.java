@@ -235,7 +235,8 @@ public class GalaxyWorkflowLanguagePluginTest {
       try {
         final String fileContent =
             FileUtils.readFileToString(
-                new File("src/test/resources/" + this.id.get() + "/listing.json"));
+                new File("src/test/resources/" + this.id.get() + "/listing.json"),
+                StandardCharsets.UTF_8);
         return gson.fromJson(
             fileContent, TypeToken.getParameterized(List.class, String.class).getType());
       } catch (IOException e) {
