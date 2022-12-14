@@ -9,8 +9,9 @@ public class Lint {
   public static int EXIT_CODE_FILE_PARSE_FAILED = 3;
 
   public static LintContext lint(final Map<String, Object> workflow) {
+    final String wfClass = (String) workflow.get("class");
     GalaxyWorkflowLinter linter;
-    if (isGXFormat2Workflow(workflow)) {
+    if (wfClass != null && wfClass.equals("GalaxyWorkflow")) {
       linter = new Format2Linter();
     } else {
       linter = new NativeLinter();
@@ -18,11 +19,6 @@ public class Lint {
     final LintContext lintContext = new LintContext();
     linter.lint(lintContext, workflow);
     return lintContext;
-  }
-
-  public static boolean isGXFormat2Workflow(final Map<String, Object> workflow) {
-    final String wfClass = (String) workflow.get("class");
-    return wfClass != null && wfClass.equals("GalaxyWorkflow");
   }
 
   public static void main(String[] args) throws Exception {

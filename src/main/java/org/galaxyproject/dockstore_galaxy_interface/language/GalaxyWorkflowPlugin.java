@@ -53,6 +53,19 @@ public class GalaxyWorkflowPlugin extends Plugin {
   public static class GalaxyWorkflowPluginImpl implements CompleteLanguageInterface {
     private ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * This is basically stolen from org.galaxyproject.gxformat2.Lint.
+     * However, that is generated code and cannot be modified so putting it here along with this warning that
+     * the two should probably be in sync.
+     *
+     * @param workflow
+     * @return
+     */
+    public static boolean isGXFormat2Workflow(final Map<String, Object> workflow) {
+      final String wfClass = (String) workflow.get("class");
+      return wfClass != null && wfClass.equals("GalaxyWorkflow");
+    }
+
     @Override
     public String launchInstructions(String trsID) {
       return null;
@@ -151,7 +164,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
       String languageVersion = null;
       try {
         final Map<String, Object> workflowMap = loadWorkflow(contents);
-        if (Lint.isGXFormat2Workflow(workflowMap)) {
+        if (isGXFormat2Workflow(workflowMap)) {
           languageVersion = "gxformat2";
         } else {
           languageVersion = "gxformat1";
