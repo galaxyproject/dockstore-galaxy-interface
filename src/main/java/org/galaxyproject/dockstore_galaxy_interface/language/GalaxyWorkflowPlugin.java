@@ -54,16 +54,16 @@ public class GalaxyWorkflowPlugin extends Plugin {
     private ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * This is basically stolen from org.galaxyproject.gxformat2.Lint.
-     * However, that is generated code and cannot be modified so putting it here along with this warning that
-     * the two should probably be in sync.
+     * This is basically stolen from org.galaxyproject.gxformat2.Lint. However, that is generated
+     * code and cannot be modified so putting it here along with this warning that the two should
+     * probably be in sync.
      *
      * @param workflow
      * @return
      */
     public static boolean isGXFormat2Workflow(final Map<String, Object> workflow) {
       final String wfClass = (String) workflow.get("class");
-      return wfClass != null && wfClass.equals("GalaxyWorkflow");
+      return "GalaxyWorkflow".equals(wfClass);
     }
 
     @Override
@@ -264,7 +264,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
                 String enclosingFile = (String) docMap.get("$include");
                 Optional<FileMetadata> first =
                     indexedFiles.values().stream()
-                        .filter(pair -> pair.content().equals(enclosingFile))
+                        .filter(fileMetadata -> fileMetadata.content().equals(enclosingFile))
                         .findFirst();
                 if (first.isPresent()) {
                   // No way to fetch this here...
