@@ -128,6 +128,38 @@ public class GalaxyWorkflowLanguagePluginTest {
   }
 
   @Test
+  public void testNativeWorkflowParsingWithUnusualStructure() {
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+            new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
+    final ResourceFileReader reader = new ResourceFileReader("test.error1");
+    final String initialPath = "Galaxy-Workflow-Long_read_assembly_with_Hifiasm_and_HiC_data.ga";
+    final String contents = reader.readFile(initialPath);
+    final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
+            plugin.indexWorkflowFiles(initialPath, contents, reader);
+    assertTrue(
+            fileMap.entrySet().stream()
+                    .anyMatch(entry -> entry.getValue().languageVersion().equals("gxformat1")));
+
+
+    final VersionTypeValidation wfValidation =
+            plugin.validateWorkflowSet(initialPath, contents, fileMap);
+    assertTrue(wfValidation.isValid());
+    // No validation messages because everything is fine... well, not this one but the message is unclear
+    // assertTrue(wfValidation.getMessage().isEmpty());
+
+    // issue is demonstrated here, looks like tool_id with id 177550 on line 2821 is an issue, not sure if this is valid
+    final Map<String, Object> cytoscapeElements = plugin.loadCytoscapeElements(initialPath, contents, fileMap);
+
+    // do a sanity check for a valid cytoscape JSON
+    // http://manual.cytoscape.org/en/stable/Supported_Network_File_Formats.html#cytoscape-js-json
+    //    assertTrue(cytoscapeElements.containsKey("nodes") && cytoscapeElements.containsKey("edges"));
+    //
+    //    final List<CompleteLanguageInterface.RowData> rowData =
+    //            plugin.generateToolsTable(initialPath, contents, fileMap);
+    //    Assert.assertFalse(rowData.isEmpty());
+  }
+
+  @Test
   public void testCompletelyInvalidFile() {
     final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
         new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
