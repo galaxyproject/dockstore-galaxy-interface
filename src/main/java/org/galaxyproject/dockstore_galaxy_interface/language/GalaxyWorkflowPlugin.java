@@ -78,6 +78,9 @@ public class GalaxyWorkflowPlugin extends Plugin {
       try {
         return Cytoscape.getElements(workflow);
       } catch (ClassCastException e) {
+        LOG.error(
+            "ClassCastException, looks like an invalid workflow that passed the linter: "
+                + e.getMessage());
         return Map.of();
       }
     }
