@@ -75,7 +75,14 @@ public class GalaxyWorkflowPlugin extends Plugin {
     public Map<String, Object> loadCytoscapeElements(
         String initialPath, String contents, Map<String, FileMetadata> indexedFiles) {
       final Map<String, Object> workflow = loadWorkflow(contents);
-      return Cytoscape.getElements(workflow);
+      try {
+        return Cytoscape.getElements(workflow);
+      } catch (ClassCastException e) {
+        LOG.error(
+            "ClassCastException, looks like an invalid workflow that passed the linter: "
+                + e.getMessage());
+        return Map.of();
+      }
     }
 
     @Override

@@ -128,6 +128,34 @@ public class GalaxyWorkflowLanguagePluginTest {
   }
 
   @Test
+  public void testNativeWorkflowParsingWithUnusualStructure() {
+    final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
+        new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
+    final ResourceFileReader reader = new ResourceFileReader("test.error1");
+    final String initialPath = "Galaxy-Workflow-Long_read_assembly_with_Hifiasm_and_HiC_data.ga";
+    final String contents = reader.readFile(initialPath);
+    final Map<String, MinimalLanguageInterface.FileMetadata> fileMap =
+        plugin.indexWorkflowFiles(initialPath, contents, reader);
+    assertTrue(
+        fileMap.entrySet().stream()
+            .anyMatch(entry -> entry.getValue().languageVersion().equals("gxformat1")));
+
+    final VersionTypeValidation wfValidation =
+        plugin.validateWorkflowSet(initialPath, contents, fileMap);
+    assertTrue(wfValidation.isValid());
+    // No validation messages because everything is fine... or at least validation does not catch
+    // the issue
+    // issue is demonstrated here, looks like tool_id with id 177550 on line 2821 is an issue, but
+    // this is not supposed to be valid
+    // opened https://github.com/galaxyproject/gxformat2/issues/87 after which we can show a better
+    // validation error
+    final Map<String, Object> cytoscapeElements =
+        plugin.loadCytoscapeElements(initialPath, contents, fileMap);
+    // best we can do is error out on it
+    assertTrue(cytoscapeElements.isEmpty());
+  }
+
+  @Test
   public void testCompletelyInvalidFile() {
     final GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl plugin =
         new GalaxyWorkflowPlugin.GalaxyWorkflowPluginImpl();
