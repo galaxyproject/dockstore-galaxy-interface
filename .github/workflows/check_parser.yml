@@ -10,11 +10,11 @@ jobs:
 
     steps:
     - name: checkout this repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: dockstore-galaxy-interface
     - name: checkout gxformat2 repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: 0.15.0
         repository: galaxyproject/gxformat2
