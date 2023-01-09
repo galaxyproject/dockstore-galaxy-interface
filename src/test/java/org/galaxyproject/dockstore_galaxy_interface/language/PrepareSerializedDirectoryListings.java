@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
@@ -34,9 +35,13 @@ public class PrepareSerializedDirectoryListings {
     System.out.println(gson.toJson(content2));
 
     FileUtils.writeStringToFile(
-        new File("src/test/resources/" + REPO_ID_1 + "/listing.json"), gson.toJson(content1));
+        new File("src/test/resources/" + REPO_ID_1 + "/listing.json"),
+        gson.toJson(content1),
+        StandardCharsets.UTF_8);
     FileUtils.writeStringToFile(
-        new File("src/test/resources/" + REPO_ID_2 + "/listing.json"), gson.toJson(content2));
+        new File("src/test/resources/" + REPO_ID_2 + "/listing.json"),
+        gson.toJson(content2),
+        StandardCharsets.UTF_8);
   }
 
   private static List<String> getDirectoryListing(String id) throws IOException {

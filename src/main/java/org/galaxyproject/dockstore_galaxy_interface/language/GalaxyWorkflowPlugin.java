@@ -3,6 +3,7 @@ package org.galaxyproject.dockstore_galaxy_interface.language;
 import static org.galaxyproject.gxformat2.Cytoscape.END_ID;
 import static org.galaxyproject.gxformat2.Cytoscape.START_ID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.dockstore.common.DescriptorLanguage;
@@ -21,8 +22,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.galaxyproject.gxformat2.Cytoscape;
 import org.galaxyproject.gxformat2.Lint;
 import org.galaxyproject.gxformat2.LintContext;
@@ -52,6 +51,20 @@ public class GalaxyWorkflowPlugin extends Plugin {
 
   @Extension
   public static class GalaxyWorkflowPluginImpl implements CompleteLanguageInterface {
+    private ObjectMapper mapper = new ObjectMapper();
+
+    /**
+     * This is basically stolen from org.galaxyproject.gxformat2.Lint. However, that is generated
+     * code and cannot be modified so putting it here along with this warning that the two should
+     * probably be in sync.
+     *
+     * @param workflow
+     * @return
+     */
+    public static boolean isGXFormat2Workflow(final Map<String, Object> workflow) {
+      final String wfClass = (String) workflow.get("class");
+      return "GalaxyWorkflow".equals(wfClass);
+    }
 
     @Override
     public String launchInstructions(String trsID) {
@@ -60,18 +73,21 @@ public class GalaxyWorkflowPlugin extends Plugin {
 
     @Override
     public Map<String, Object> loadCytoscapeElements(
-        String initialPath,
-        String contents,
-        Map<String, Pair<String, GenericFileType>> indexedFiles) {
+        String initialPath, String contents, Map<String, FileMetadata> indexedFiles) {
       final Map<String, Object> workflow = loadWorkflow(contents);
-      return Cytoscape.getElements(workflow);
+      try {
+        return Cytoscape.getElements(workflow);
+      } catch (ClassCastException e) {
+        LOG.error(
+            "ClassCastException, looks like an invalid workflow that passed the linter: "
+                + e.getMessage());
+        return Map.of();
+      }
     }
 
     @Override
     public List<RowData> generateToolsTable(
-        String initialPath,
-        String contents,
-        Map<String, Pair<String, GenericFileType>> indexedFiles) {
+        String initialPath, String contents, Map<String, FileMetadata> indexedFiles) {
       final Map<String, Object> workflow = loadWorkflow(contents);
       final Map<String, Object> elements = Cytoscape.getElements(workflow);
       final List<Map> nodes = (List<Map>) elements.getOrDefault("nodes", Lists.newArrayList());
@@ -109,9 +125,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
 
     @Override
     public VersionTypeValidation validateWorkflowSet(
-        String initialPath,
-        String contents,
-        Map<String, Pair<String, GenericFileType>> indexedFiles) {
+        String initialPath, String contents, Map<String, FileMetadata> indexedFiles) {
       final LintContext lintContext = Lint.lint(loadWorkflow(contents));
       final boolean valid;
       valid = !lintContext.getFoundErrors();
@@ -133,8 +147,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
     }
 
     @Override
-    public VersionTypeValidation validateTestParameterSet(
-        Map<String, Pair<String, GenericFileType>> indexedFiles) {
+    public VersionTypeValidation validateTestParameterSet(Map<String, FileMetadata> indexedFiles) {
       return new VersionTypeValidation(true, new HashMap<>());
     }
 
@@ -150,12 +163,31 @@ public class GalaxyWorkflowPlugin extends Plugin {
     }
 
     @Override
-    public Map<String, Pair<String, GenericFileType>> indexWorkflowFiles(
+    public Map<String, FileMetadata> indexWorkflowFiles(
         final String initialPath, final String contents, final FileReader reader) {
-      Map<String, Pair<String, GenericFileType>> results = new HashMap<>();
+      Map<String, FileMetadata> results = new HashMap<>();
+
+      // identify filetype of initial descriptor, copied from Lint.java
+      String languageVersion = null;
+      try {
+        final Map<String, Object> workflowMap = loadWorkflow(contents);
+        if (isGXFormat2Workflow(workflowMap)) {
+          languageVersion = "gxformat2";
+        } else {
+          languageVersion = "gxformat1";
+        }
+      } catch (Exception e) {
+        // do nothing
+      }
+
+      results.put(
+          initialPath,
+          new FileMetadata(contents, GenericFileType.IMPORTED_DESCRIPTOR, languageVersion));
+
       final Optional<String> testParameterFile = findTestParameterFile(initialPath, reader);
       testParameterFile.ifPresent(
-          s -> results.put(s, new ImmutablePair<>(s, GenericFileType.TEST_PARAMETER_FILE)));
+          // TODO - get language version into here
+          s -> results.put(s, new FileMetadata(s, GenericFileType.TEST_PARAMETER_FILE, null)));
       return results;
     }
 
@@ -199,9 +231,7 @@ public class GalaxyWorkflowPlugin extends Plugin {
 
     @Override
     public RecommendedLanguageInterface.WorkflowMetadata parseWorkflowForMetadata(
-        String initialPath,
-        String content,
-        Map<String, Pair<String, GenericFileType>> indexedFiles) {
+        String initialPath, String content, Map<String, FileMetadata> indexedFiles) {
       RecommendedLanguageInterface.WorkflowMetadata metadata =
           new RecommendedLanguageInterface.WorkflowMetadata();
       if (content != null && !content.isEmpty()) {
@@ -239,9 +269,9 @@ public class GalaxyWorkflowPlugin extends Plugin {
               Map docMap = (Map) objectDoc;
               if (docMap.containsKey("$include")) {
                 String enclosingFile = (String) docMap.get("$include");
-                Optional<Pair<String, GenericFileType>> first =
+                Optional<FileMetadata> first =
                     indexedFiles.values().stream()
-                        .filter(pair -> pair.getLeft().equals(enclosingFile))
+                        .filter(fileMetadata -> fileMetadata.content().equals(enclosingFile))
                         .findFirst();
                 if (first.isPresent()) {
                   // No way to fetch this here...
