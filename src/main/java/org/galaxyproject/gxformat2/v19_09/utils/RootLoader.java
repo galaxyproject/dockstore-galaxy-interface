@@ -13,7 +13,7 @@ public class RootLoader {
     final String baseUri = ensureBaseUri(baseUri_);
     LoadingOptions loadingOptions = loadingOptions_;
     if (loadingOptions == null) {
-      loadingOptions = new LoadingOptionsBuilder().build();
+      loadingOptions = new LoadingOptionsBuilder().setFileUri(baseUri).build();
     }
     return LoaderInstances.union_of_GalaxyWorkflow_or_array_of_GalaxyWorkflow.documentLoad(
         doc, baseUri, loadingOptions);
@@ -28,7 +28,7 @@ public class RootLoader {
   }
 
   public static Object loadDocument(final Path path) {
-    return loadDocument(readPath(path));
+    return loadDocument(readPath(path), path.toUri().toString());
   }
 
   public static Object loadDocument(final Path path, String baseUri) {

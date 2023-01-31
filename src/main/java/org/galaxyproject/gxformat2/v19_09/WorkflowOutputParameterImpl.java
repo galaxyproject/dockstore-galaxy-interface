@@ -1,3 +1,17 @@
+// Copyright Common Workflow Language project contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.galaxyproject.gxformat2.v19_09;
 
 import org.galaxyproject.gxformat2.v19_09.utils.LoaderInstances;
@@ -35,6 +49,21 @@ public class WorkflowOutputParameterImpl extends SavableImpl implements Workflow
    */
   public java.util.Optional<String> getId() {
     return this.id;
+  }
+
+  private java.util.Optional<String> label;
+
+  /**
+   * Getter for property <I>https://w3id.org/cwl/cwl#Labeled/label</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * A short, human-readable label of this object. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<String> getLabel() {
+    return this.label;
   }
 
   private Object doc;
@@ -131,6 +160,7 @@ public class WorkflowOutputParameterImpl extends SavableImpl implements Workflow
       id = null;
     }
 
+    Boolean __original_is_null = id == null;
     if (id == null) {
       if (__docRoot != null) {
         id = java.util.Optional.of(__docRoot);
@@ -138,7 +168,27 @@ public class WorkflowOutputParameterImpl extends SavableImpl implements Workflow
         id = java.util.Optional.of("_:" + java.util.UUID.randomUUID().toString());
       }
     }
-    __baseUri = (String) id.orElse(null);
+    if (__original_is_null) {
+      __baseUri = __baseUri_;
+    } else {
+      __baseUri = (String) id.orElse(null);
+    }
+    java.util.Optional<String> label;
+
+    if (__doc.containsKey("label")) {
+      try {
+        label =
+            LoaderInstances.optional_StringInstance.loadField(
+                __doc.get("label"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        label = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `label` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      label = null;
+    }
     Object doc;
 
     if (__doc.containsKey("doc")) {
@@ -190,6 +240,7 @@ public class WorkflowOutputParameterImpl extends SavableImpl implements Workflow
     if (!__errors.isEmpty()) {
       throw new ValidationException("Trying 'RecordField'", __errors);
     }
+    this.label = (java.util.Optional<String>) label;
     this.doc = (Object) doc;
     this.id = (java.util.Optional<String>) id;
     this.outputSource = (java.util.Optional<String>) outputSource;

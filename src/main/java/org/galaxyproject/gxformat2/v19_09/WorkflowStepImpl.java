@@ -1,3 +1,17 @@
+// Copyright Common Workflow Language project contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.galaxyproject.gxformat2.v19_09;
 
 import org.galaxyproject.gxformat2.v19_09.utils.LoaderInstances;
@@ -284,6 +298,24 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
     return this.runtime_inputs;
   }
 
+  private java.util.Optional<String> when;
+
+  /**
+   * Getter for property <I>https://galaxyproject.org/gxformat2/v19_09#when</I><br>
+   *
+   * <BLOCKQUOTE>
+   *
+   * If defined, only run the step when the expression evaluates to `true`. If `false` the step is
+   * skipped. A skipped step produces a `null` on each output.
+   *
+   * <p>Expression should be an ecma5.1 expression. *
+   *
+   * </BLOCKQUOTE>
+   */
+  public java.util.Optional<String> getWhen() {
+    return this.when;
+  }
+
   /**
    * Used by {@link org.galaxyproject.gxformat2.v19_09.utils.RootLoader} to construct instances of
    * WorkflowStepImpl.
@@ -332,6 +364,7 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
       id = null;
     }
 
+    Boolean __original_is_null = id == null;
     if (id == null) {
       if (__docRoot != null) {
         id = java.util.Optional.of(__docRoot);
@@ -339,7 +372,11 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
         id = java.util.Optional.of("_:" + java.util.UUID.randomUUID().toString());
       }
     }
-    __baseUri = (String) id.orElse(null);
+    if (__original_is_null) {
+      __baseUri = __baseUri_;
+    } else {
+      __baseUri = (String) id.orElse(null);
+    }
     java.util.Optional<String> label;
 
     if (__doc.containsKey("label")) {
@@ -554,7 +591,7 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
     if (__doc.containsKey("run")) {
       try {
         run =
-            LoaderInstances.uri_optional_GalaxyWorkflow_False_False_None.loadField(
+            LoaderInstances.optional_GalaxyWorkflow.loadField(
                 __doc.get("run"), __baseUri, __loadingOptions);
       } catch (ValidationException e) {
         run = null; // won't be used but prevents compiler from complaining.
@@ -581,6 +618,22 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
     } else {
       runtime_inputs = null;
     }
+    java.util.Optional<String> when;
+
+    if (__doc.containsKey("when")) {
+      try {
+        when =
+            LoaderInstances.optional_StringInstance.loadField(
+                __doc.get("when"), __baseUri, __loadingOptions);
+      } catch (ValidationException e) {
+        when = null; // won't be used but prevents compiler from complaining.
+        final String __message = "the `when` field is not valid because:";
+        __errors.add(new ValidationException(__message, e));
+      }
+
+    } else {
+      when = null;
+    }
     if (!__errors.isEmpty()) {
       throw new ValidationException("Trying 'RecordField'", __errors);
     }
@@ -600,5 +653,6 @@ public class WorkflowStepImpl extends SavableImpl implements WorkflowStep {
     this.type = (java.util.Optional<WorkflowStepType>) type;
     this.run = (java.util.Optional<GalaxyWorkflow>) run;
     this.runtime_inputs = (java.util.Optional<java.util.List<Object>>) runtime_inputs;
+    this.when = (java.util.Optional<String>) when;
   }
 }
